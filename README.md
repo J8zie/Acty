@@ -1,6 +1,6 @@
-# KalinIS
+# Acty
 
-KalinIS is a community-based system enabling residents to report local issues like blocked drainage or overgrown grass. Users can post problems with details including photos, descriptions, and locations, while volunteers can discover and offer assistance. Requests for help can be created, and volunteers coordinate tasks through the platform. Community volunteers, or Vlogers, can document the problem-solving process and share outcomes. Once resolved, volunteers can upload outcome photos and report resolution, creating a record of community responses and fostering transparency in addressing local issues.
+Acty is a community-based system enabling residents to report local issues like blocked drainage or overgrown grass. Users can post problems with details including photos, descriptions, and locations, while volunteers can discover and offer assistance. Requests for help can be created, and volunteers coordinate tasks through the platform. Community volunteers, or Vlogers, can document the problem-solving process and share outcomes. Once resolved, volunteers can upload outcome photos and report resolution, creating a record of community responses and fostering transparency in addressing local issues.
 
 ## TOOL AND TECHNOLOGIES
 
