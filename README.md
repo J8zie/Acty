@@ -4,7 +4,7 @@ Acty is a community-based system enabling residents to report local issues like 
 
 ## TOOL AND TECHNOLOGIES
 
-### FRONTEND 
+### FRONTEND
 
 ![Angular](https://img.shields.io/badge/Angular-DD0031?style=flat-square&logo=angular&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
@@ -29,7 +29,35 @@ Acty is a community-based system enabling residents to report local issues like 
 ![Draw.io](https://img.shields.io/badge/Draw.io-F08705?style=flat-square&logo=diagramsdotnet&logoColor=white)
 ![Figma](https://img.shields.io/badge/Figma-F24E1E?style=flat-square&logo=figma&logoColor=white)
 
-### DEPLOYMENT AND HOSTING 
+### DEPLOYMENT AND HOSTING
+
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?style=flat-square&logo=supabase&logoColor=white)
+
+## API CONVENTION
+
+### SUCCESSFULL RESPONSE
+
+    {
+
+    "id": "522cf353-b75a-4a3a-8fae-a185c78895de",{
+    "username": "test123",
+    "password":"$2y$12$HFtGTCGrbbafAKXtjKzhTOpP8s9DTdyWdrbnslDbqwUZ6L5jTdHpC"
+    }
+    }
+
+### STATUS CODE
+
+- 200: Request succeeded
+- 201: A new item was created
+- 404: The requested item was not found
+- 422: The submitted data was invalid
+
+### ERROR RESPONSE
+
+    {
+    "message":"operation is halt due to being invalid"
+    }
+
+### RUN INSTRUCTION
