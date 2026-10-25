@@ -17,8 +17,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
-
+    'sslmode' => env('DB_SSLMODE', 'prefer'),
     /*
     |--------------------------------------------------------------------------
     | Database Connections
