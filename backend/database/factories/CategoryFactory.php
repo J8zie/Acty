@@ -12,7 +12,7 @@ class CategoryFactory extends Factory
 
     // Makes a fake record for tests.
 
-    public function public function definition(): array
+    public function definition(): array
     {
         return ['name' => fake()->unique()->words(2, true)];
     }

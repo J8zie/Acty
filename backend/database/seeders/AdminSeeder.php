@@ -11,7 +11,7 @@ class AdminSeeder extends Seeder
 
     // Fills the table with starter data.
 
-    public function public function run(): void
+    public function run(): void
     {
         $username = env('ADMIN_USERNAME');
         $email = env('ADMIN_EMAIL');

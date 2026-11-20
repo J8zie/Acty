@@ -16,7 +16,7 @@ class CategorySeeder extends Seeder
 
     // Fills the table with starter data.
 
-    public function public function run(): void
+    public function run(): void
     {
         foreach (self::NAMES as $name) {
             Category::query()->firstOrCreate(['name' => $name]);

@@ -22,7 +22,7 @@ class ReportFactory extends Factory
 
     // Makes a fake record for tests.
 
-    public function public function definition(): array
+    public function definition(): array
     {
         return [
             'user_id' => User::factory(),

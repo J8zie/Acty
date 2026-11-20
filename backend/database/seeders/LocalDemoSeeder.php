@@ -20,7 +20,7 @@ class LocalDemoSeeder extends Seeder
 
     // Fills the table with starter data.
 
-    public function public function run(): void
+    public function run(): void
     {
         if (app()->isProduction()) {
             $this->command?->error('LocalDemoSeeder never runs in production.');

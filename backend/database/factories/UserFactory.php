@@ -13,7 +13,7 @@ class UserFactory extends Factory
 
     // Makes a fake record for tests.
 
-    public function public function definition(): array
+    public function definition(): array
     {
         return [
             'username' => fake()->unique()->userName().fake()->unique()->numerify('##'),

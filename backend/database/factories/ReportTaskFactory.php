@@ -15,7 +15,7 @@ class ReportTaskFactory extends Factory
 
     // Makes a fake record for tests.
 
-    public function public function definition(): array
+    public function definition(): array
     {
         return [
             'report_id' => Report::factory(),

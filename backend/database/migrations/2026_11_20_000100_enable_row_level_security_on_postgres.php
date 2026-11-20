@@ -8,7 +8,7 @@ return new class extends Migration
 
     // Creates the table.
 
-    public function public function up(): void
+    public function up(): void
     {
         if (DB::connection()->getDriverName() !== 'pgsql') {
             return;
@@ -22,7 +22,7 @@ return new class extends Migration
 
     // Drops the table.
 
-    public function public function down(): void
+    public function down(): void
     {
         if (DB::connection()->getDriverName() !== 'pgsql') {
             return;

@@ -9,7 +9,7 @@ return new class extends Migration
 
     // Creates the table.
 
-    public function public function up(): void
+    public function up(): void
     {
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
@@ -48,7 +48,7 @@ return new class extends Migration
 
     // Drops the table.
 
-    public function public function down(): void
+    public function down(): void
     {
         Schema::dropIfExists('failed_jobs');
         Schema::dropIfExists('job_batches');

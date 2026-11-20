@@ -9,7 +9,7 @@ return new class extends Migration
 
     // Creates the table.
 
-    public function public function up(): void
+    public function up(): void
     {
         Schema::create('report_tasks', function (Blueprint $table) {
             $table->id();
@@ -32,7 +32,7 @@ return new class extends Migration
 
     // Drops the table.
 
-    public function public function down(): void
+    public function down(): void
     {
         Schema::dropIfExists('report_tasks');
     }
