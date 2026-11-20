@@ -1,0 +1,22 @@
+
+
+<button
+  type="button"
+  appMagnetic
+  class="label group inline-flex items-center gap-2.5"
+  [attr.aria-label]="theme.theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+  (click)="toggle($event)"
+>
+  
+  <span class="u-link hidden sm:inline">{{ theme.theme() === 'dark' ? 'Light' : 'Dark' }}</span>
+  
+  <svg
+    viewBox="0 0 20 20"
+    class="h-[1.15rem] w-[1.15rem] transition-transform duration-700 ease-expo"
+    [class.rotate-180]="theme.theme() === 'light'"
+    aria-hidden="true"
+  >
+    <circle cx="10" cy="10" r="8.5" fill="none" stroke="currentColor" stroke-width="1.5" />
+    <path d="M10 1.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" />
+  </svg>
+</button>

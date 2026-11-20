@@ -1,0 +1,48 @@
+
+
+<app-page-head
+  eyebrow="Volunteers"
+  [meta]="list.state() === 'ready' ? ranked().length + ' volunteers' : ''"
+  title="The people who show up."
+  lead="Ranked by tasks completed, then by average rating from residents."
+/>
+
+<app-load-state [state]="list.state()" [error]="list.error()" (retry)="list.reload()" />
+
+@if (list.state() === 'ready') {
+  <section>
+    
+    <div class="container-x label grid-12 hairline-t py-3 opacity-60">
+      <span class="col-span-2 md:col-span-1">Rank</span>
+      <span class="col-span-6 md:col-span-5">Volunteer</span>
+      <span class="hidden md:col-span-2 md:block">Barangay</span>
+      <span class="col-span-2 text-right md:col-span-2">Done</span>
+      <span class="col-span-2 text-right md:col-span-2">Rating</span>
+    </div>
+    <ol class="works">
+      
+      @for (v of ranked(); track v.id; let i = $index) {
+        <li class="hairline-t" [appFadeUp]="i">
+          <div class="row container-x grid-12 items-baseline py-5 hover:bg-brand-text hover:text-brand-background md:py-7">
+            <span class="label col-span-2 md:col-span-1">{{ i + 1 }}</span>
+            
+            <span class="col-span-6 md:col-span-5" [class]="i < 3 ? 'text-headline' : 'text-title'">{{ v.name }}</span>
+            <span class="label hidden opacity-60 md:col-span-2 md:block">{{ v.barangay }}</span>
+            
+            <span class="text-title col-span-2 text-right md:col-span-2">{{ v.completed }}</span>
+            <span class="text-title col-span-2 text-right md:col-span-2">
+              {{ v.average.toFixed(1) }}<span class="label ml-1 opacity-60">★ {{ v.ratings }}</span>
+            </span>
+          </div>
+        </li>
+      } @empty {
+        
+        <li class="hairline-t container-x py-12">
+          <p class="text-title">No volunteers ranked yet.</p>
+          <p class="label mt-3 opacity-60">Rankings appear after the first task is completed.</p>
+        </li>
+      }
+    </ol>
+    <div class="hairline-t"></div>
+  </section>
+}

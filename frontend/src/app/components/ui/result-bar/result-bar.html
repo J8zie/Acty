@@ -1,0 +1,16 @@
+
+<div class="flex flex-wrap items-center gap-x-5 gap-y-2" data-testid="result-bar">
+  <p class="label opacity-70" role="status" aria-live="polite" data-testid="result-count">
+    @if (total() === 0) {
+      {{ filtered() ? 'No ' + noun() + ' match.' : 'No ' + noun() + '.' }}
+    } @else if (shown() < total()) {
+      Showing {{ shown() }} of {{ total() }} {{ noun() }}
+    } @else {
+      {{ total() }} {{ noun() }}
+    }
+    @if (busy()) { <span class="opacity-70"> · Updating…</span> }
+  </p>
+  @if (filtered()) {
+    <button type="button" class="label u-link" data-testid="clear-filters" (click)="clear.emit()">Clear filters</button>
+  }
+</div>

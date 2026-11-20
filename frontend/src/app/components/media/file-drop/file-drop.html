@@ -1,0 +1,27 @@
+
+<label
+  class="group relative block cursor-pointer overflow-hidden border border-dashed border-brand-text/40 transition-colors duration-500 hover:border-brand-text"
+  [class.bg-brand-text/10]="over()"
+  (dragover)="$event.preventDefault(); over.set(true)"
+  (dragleave)="over.set(false)"
+  (drop)="onDrop($event)"
+>
+  
+  
+  <input type="file" accept="image/jpeg,image/png,image/webp" class="sr-only" (change)="onPick($event)" />
+  
+  
+  @if (preview(); as src) {
+    <img [src]="src" alt="Selected photo preview" class="max-h-72 w-full object-cover" />
+    <span class="label absolute right-3 bottom-3 bg-brand-background px-2 py-1.5">Replace photo</span>
+  } @else {
+    <span class="flex min-h-40 flex-col items-center justify-center gap-2 p-6 text-center">
+      <span class="text-title">{{ title() }}</span>
+      <span class="label opacity-60">{{ busy() ? 'Preparing photo…' : 'Tap to take or choose a photo' }}</span>
+    </span>
+  }
+</label>
+
+@if (problem()) {
+  <p class="error-text mt-2" role="alert">{{ problem() }}</p>
+}

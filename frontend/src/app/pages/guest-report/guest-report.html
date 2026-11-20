@@ -1,0 +1,215 @@
+
+
+@if (receipt(); as r) {
+  <app-page-head eyebrow="Report" meta="Sent" title="Thank you. Your report is in." lead="A barangay admin will check your details and photos. Once approved, it appears on the Reports page and volunteers nearby can pick it up." />
+  <section class="container-x grid gap-10 pb-10">
+    
+    @if (r.reference) {
+      <div class="hairline-t pt-8">
+        <p class="label opacity-60">Your reference</p>
+        <p class="text-display mt-3 [font-variant-numeric:tabular-nums]" data-testid="reference">{{ r.reference }}</p>
+        <p class="label mt-4 max-w-[48ch] opacity-60">Keep this code. If an admin needs to reach you, they will call or text the number you gave.</p>
+      </div>
+    }
+    <div class="flex flex-wrap gap-3">
+      <a appLink="/reports" appMagnetic class="btn btn-solid">See all reports</a>
+      
+      <button type="button" class="btn" appMagnetic (click)="another()">File another report</button>
+    </div>
+  </section>
+} @else {
+  
+  <app-page-head eyebrow="Report" meta="No account needed" title="See a problem? Report it." lead="Three quick steps: who you are with a quick selfie, then the problem, then a live photo of it. So everyone can trust that a real person is reporting." />
+
+  
+  <ol class="container-x mb-10 flex flex-wrap gap-x-8 gap-y-2" aria-label="Steps">
+    @for (s of steps; track s; let i = $index) {
+      <li class="label flex items-center gap-2.5" [class.opacity-40]="i > step()" [attr.aria-current]="i === step() ? 'step' : null">
+        <span class="dot" [class.dot-open]="i === step()" [class.dot-solid]="i < step()"></span>
+        0{{ i + 1 }} · {{ s }}
+      </li>
+    }
+  </ol>
+
+  
+  <form class="container-x grid gap-y-10 pb-6" [formGroup]="form" (ngSubmit)="next()" novalidate>
+    
+    @switch (step()) {
+      
+      @case (0) {
+        <div class="grid-12 gap-y-12">
+          
+          <div class="col-span-12 grid content-start gap-8 md:col-span-6">
+            <div class="grid gap-8 sm:grid-cols-2">
+              <label class="field"><span class="label">First name</span>
+                <input class="input" formControlName="firstName" autocomplete="given-name" maxlength="60" data-testid="guest-first-name" [attr.aria-invalid]="bad('firstName')" />
+                <app-field-error [control]="form.controls.firstName" label="First name" [server]="server().firstName ?? ''" /></label>
+              <label class="field"><span class="label">Last name</span>
+                <input class="input" formControlName="lastName" autocomplete="family-name" maxlength="60" data-testid="guest-last-name" [attr.aria-invalid]="bad('lastName')" />
+                <app-field-error [control]="form.controls.lastName" label="Last name" [server]="server().lastName ?? ''" /></label>
+            </div>
+            <label class="field"><span class="label">Mobile number</span>
+              <input class="input" type="tel" inputmode="tel" autocomplete="tel" formControlName="phone" maxlength="30" data-testid="guest-phone" placeholder="0917 123 4567" [attr.aria-invalid]="bad('phone')" />
+              <span class="label opacity-60">An admin may call or text to confirm your report.</span>
+              <app-field-error [control]="form.controls.phone" label="Mobile number" [server]="server().phone ?? ''" /></label>
+            <label class="field"><span class="label">Email (optional)</span>
+              <input class="input" type="email" inputmode="email" autocomplete="email" formControlName="email" maxlength="255" [attr.aria-invalid]="bad('email')" />
+              <app-field-error [control]="form.controls.email" label="Email" [server]="server().email ?? ''" /></label>
+            
+            <label class="field"><span class="label">Your barangay</span>
+              <select class="input" formControlName="homeBarangay" autocomplete="off" [attr.aria-invalid]="bad('homeBarangay')">
+                <option value="" disabled>Choose one</option>
+                @for (b of barangays; track b) {
+                  <option [value]="b">{{ b }}</option>
+                }
+              </select>
+              <app-field-error [control]="form.controls.homeBarangay" label="Your barangay" [server]="server().homeBarangay ?? ''" /></label>
+          </div>
+          
+          <div class="col-span-12 grid content-start gap-6 md:col-span-5 md:col-start-8">
+            <div>
+              <p class="label mb-3 opacity-60">Your photo · a quick selfie</p>
+              
+              <app-camera-capture
+                facing="user"
+                title="A quick selfie"
+                hint="Show your face and do the move shown on screen. Only barangay admins see this."
+                [prompt]="prompt"
+                [stamp]="'SELFIE · ' + prompt.toUpperCase()"
+                [value]="selfieShot()"
+                (shot)="selfieShot.set($event)"
+              />
+            </div>
+            <p class="text-title opacity-85">A real person stands behind every report. Your details and selfie are seen only by barangay admins and are never shown on the site.</p>
+            
+            <p class="opacity-70">Want to follow your reports and rate the volunteers who help? <a appLink="/register" class="u-link">Create an account</a> or <a appLink="/login" class="u-link">log in</a>.</p>
+          </div>
+        </div>
+      }
+      
+      @case (1) {
+        <div class="grid-12 gap-y-14">
+          
+          <div class="col-span-12 grid content-start gap-8 md:col-span-6">
+            <label class="field"><span class="label">What is the problem?</span>
+              <input class="input" formControlName="title" maxlength="120" data-testid="guest-title" placeholder="Clogged drain on Rizal Street" [attr.aria-invalid]="bad('title')" />
+              <app-field-error [control]="form.controls.title" label="Title" [server]="server().title ?? ''" /></label>
+
+            
+            <label class="field"><span class="label">Category</span>
+              <select class="input" formControlName="categoryId" [attr.aria-invalid]="bad('categoryId')">
+                <option value="" disabled>{{ categories.state() === 'loading' ? 'Loading…' : 'Choose one' }}</option>
+                @for (c of categories.data(); track c.id) {
+                  <option [value]="c.id">{{ c.name }}</option>
+                }
+              </select>
+              <app-field-error [control]="form.controls.categoryId" label="Category" [server]="server().categoryId ?? ''" />
+              @if (categories.state() === 'error') {
+                <span class="error-text">Could not load categories. <button type="button" class="u-link" (click)="categories.reload()">Try again</button></span>
+              }</label>
+
+            
+            <div>
+              <p class="label mb-3 opacity-60">Help needed</p>
+              <div class="flex flex-wrap gap-2" role="group" aria-label="Type of assistance">
+                @for (a of assistance; track a.value) {
+                  <button type="button" class="chip" [attr.aria-pressed]="form.controls.assistanceType.value === a.value" (click)="form.controls.assistanceType.setValue(a.value)">{{ a.label }}</button>
+                }
+              </div>
+            </div>
+
+            <div>
+              <p class="label mb-3 opacity-60">Urgency</p>
+              <div class="flex flex-wrap gap-2" role="group" aria-label="Urgency">
+                @for (u of urgencies; track u.value) {
+                  <button type="button" class="chip" [attr.aria-pressed]="form.controls.urgency.value === u.value" (click)="form.controls.urgency.setValue(u.value)">{{ u.label }}</button>
+                }
+              </div>
+            </div>
+
+            
+            <label class="field"><span class="label">Barangay of the problem</span>
+              <select class="input" formControlName="barangay" [attr.aria-invalid]="bad('barangay')">
+                <option value="" disabled>Choose one</option>
+                @for (b of barangays; track b) {
+                  <option [value]="b">{{ b }}</option>
+                }
+              </select>
+              <app-field-error [control]="form.controls.barangay" label="Barangay" [server]="server().barangay ?? ''" /></label>
+
+            <label class="field"><span class="label">Describe it</span>
+              <textarea class="input" rows="4" formControlName="description" placeholder="What is wrong, how long has it been like this, who is affected?" maxlength="2000" data-testid="guest-description" [attr.aria-invalid]="bad('description')"></textarea>
+              <span class="label opacity-60">{{ form.controls.description.value.length }} / 2000 · at least 15 characters</span>
+              <app-field-error [control]="form.controls.description" label="Description" [server]="server().description ?? ''" /></label>
+          </div>
+
+          
+          <div class="col-span-12 md:col-span-5 md:col-start-8">
+            <div class="mb-3 flex items-center justify-between gap-4">
+              <p class="label opacity-60">Location · tap the map to drop a pin</p>
+              <button type="button" class="label u-link shrink-0" (click)="locate()">Use my location</button>
+            </div>
+            
+            <app-map class="h-80 md:h-[26rem]" [pick]="true" [(position)]="position" [attr.aria-invalid]="tried() && !position() ? true : null" />
+            
+            <p class="label mt-3" [class.opacity-60]="!!position()">
+              @if (position(); as p) { {{ p.lat }}, {{ p.lng }} } @else { No pin yet }
+            </p>
+            @if (geoError()) {
+              <p class="error-text mt-1" role="alert">{{ geoError() }}</p>
+            }
+          </div>
+        </div>
+      }
+      
+      @default {
+        <div class="grid-12 gap-y-12">
+          <div class="col-span-12 md:col-span-6">
+            <p class="label mb-3 opacity-60">Photo of the problem</p>
+            
+            <app-camera-capture
+              facing="environment"
+              title="Photo of the problem"
+              hint="Point the back camera at it. Live camera only: photos from your gallery are not accepted."
+              [stamp]="problemStamp()"
+              [value]="problemShot()"
+              (shot)="problemShot.set($event)"
+            />
+          </div>
+          
+          <aside class="col-span-12 grid content-start gap-4 md:col-span-4 md:col-start-9">
+            <p class="label opacity-60">Check before sending</p>
+            <dl class="hairline-t">
+              @for (row of review(); track row.k) {
+                <div class="hairline-b flex items-baseline justify-between gap-6 py-3">
+                  <dt class="label opacity-60">{{ row.k }}</dt>
+                  <dd class="text-right text-base tracking-tight">{{ row.v }}</dd>
+                </div>
+              }
+            </dl>
+            <p class="label opacity-60">Something wrong? Press Back to fix it.</p>
+          </aside>
+          
+          <label class="col-span-12 flex max-w-[62ch] cursor-pointer items-start gap-3">
+            <input type="checkbox" class="mt-1 size-5 shrink-0 accent-brand-accent" formControlName="consent" />
+            <span class="opacity-85">I confirm this is a real, non-emergency problem, that the photos were taken just now, and that Actify may use my details to verify and follow up on this report.</span>
+          </label>
+        </div>
+      }
+    }
+
+    
+    <div class="flex flex-wrap items-center gap-4">
+      @if (step() > 0) {
+        <button type="button" class="btn" [disabled]="busy()" (click)="back()">Back</button>
+      }
+      <button type="submit" class="btn btn-solid" appMagnetic [disabled]="busy()">
+        {{ step() < 2 ? 'Continue' : busy() ? 'Sending…' : 'Send report' }}
+      </button>
+      
+      @if (problem(); as msg) {
+        <p class="error-text" role="alert">{{ msg }}</p>
+      }
+    </div>
+  </form>
+}

@@ -1,0 +1,20 @@
+
+<label class="field min-w-[14rem]">
+  <span class="label opacity-60">{{ label() }}</span>
+  <span class="relative block">
+    <input
+      class="input w-full !pr-9"
+      type="search"
+      autocomplete="off"
+      spellcheck="false"
+      maxlength="100"
+      [value]="value()"
+      [placeholder]="placeholder()"
+      [attr.data-testid]="testId()"
+      (input)="onInput($event)"
+    />
+    @if (value()) {
+      <button type="button" class="clear label" aria-label="Clear search" data-testid="search-clear" (click)="value.set('')">✕</button>
+    }
+  </span>
+</label>

@@ -1,0 +1,86 @@
+<!doctype html>
+
+<html lang="en" data-theme="dark">
+<head>
+  
+  <meta charset="utf-8">
+  
+  <title>Actify | Community reports, volunteer action</title>
+  
+  <base href="/">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  
+  <meta name="description" content="Actify is a community-powered platform where residents report local problems and volunteers turn them into documented action.">
+  
+  <meta name="theme-color" content="#05386b">
+  
+  <meta name="color-scheme" content="dark light">
+  
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Actify">
+  
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  
+  <script>
+    /* apply the saved theme before first paint (no flash) */
+    try {
+      var t = localStorage.getItem('actify-theme');
+      if (t === 'light' || t === 'dark') {
+        document.documentElement.dataset.theme = t;
+        var m = document.querySelector('meta[name="theme-color"]');
+        if (m) m.setAttribute('content', t === 'light' ? '#5cdb95' : '#05386b');
+      }
+    } catch (e) {}
+  </script>
+</head>
+
+<body class="bg-brand-background text-brand-text">
+  
+  
+  
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="tritone" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%">
+      <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="1.25" intercept="-0.1"/>
+        <feFuncG type="linear" slope="1.25" intercept="-0.1"/>
+        <feFuncB type="linear" slope="1.25" intercept="-0.1"/>
+      </feComponentTransfer>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.02 0.36 1"/>
+        <feFuncG type="table" tableValues="0.22 0.86 0.91"/>
+        <feFuncB type="table" tableValues="0.42 0.58 0.76"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
+  
+  
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <filter id="map-dark" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%">
+      <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.361 0.329 0.298 0.267 0.235 0.176 0.118 0.054 0.012"/>
+        <feFuncG type="table" tableValues="0.859 0.811 0.763 0.715 0.667 0.559 0.451 0.307 0.125"/>
+        <feFuncB type="table" tableValues="0.584 0.585 0.586 0.587 0.588 0.575 0.562 0.483 0.282"/>
+      </feComponentTransfer>
+    </filter>
+    <filter id="map-light" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%">
+      <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.020 0.080 0.139 0.199 0.268 0.350 0.431 0.684 0.980"/>
+        <feFuncG type="table" tableValues="0.220 0.333 0.446 0.559 0.663 0.753 0.843 0.926 1.000"/>
+        <feFuncB type="table" tableValues="0.420 0.456 0.492 0.527 0.565 0.606 0.647 0.798 0.988"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
+  
+  <app-root></app-root>
+  
+  <noscript>Actify needs JavaScript to run.</noscript>
+</body>
+</html>

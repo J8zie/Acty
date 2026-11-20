@@ -1,0 +1,33 @@
+
+<app-page-head eyebrow="Account" meta="Log in" title="Welcome back." lead="Log in to report problems, accept requests or manage the platform." />
+
+<section class="container-x grid-12 gap-y-16">
+  
+  <form class="col-span-12 grid max-w-xl gap-8 md:col-span-6" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    
+    <label class="field">
+      <span class="label">Username</span>
+      <input class="input" formControlName="username" autocomplete="username" autocapitalize="none" spellcheck="false" [attr.aria-invalid]="bad('username')" />
+    </label>
+    <label class="field">
+      <span class="label">Password</span>
+      <input class="input" type="password" formControlName="password" autocomplete="current-password" [attr.aria-invalid]="bad('password')" />
+    </label>
+    
+    @if (error()) {
+      <p class="error-text" role="alert">{{ error() }}</p>
+    }
+    <div class="flex flex-wrap items-center gap-6">
+      
+      <button type="submit" class="btn btn-solid" appMagnetic [disabled]="busy()">{{ busy() ? 'Logging in…' : 'Log in' }}</button>
+      <a appLink="/register" class="label u-link">No account? Join</a>
+    </div>
+  </form>
+
+  
+  <aside class="col-span-12 md:col-span-4 md:col-start-9">
+    <p class="label opacity-60">New here?</p>
+    <p class="text-title mt-3 max-w-[22ch]">Residents report. Volunteers solve.</p>
+    <a appLink="/register" class="btn mt-6 w-fit">Create an account</a>
+  </aside>
+</section>

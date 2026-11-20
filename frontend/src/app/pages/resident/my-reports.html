@@ -1,0 +1,44 @@
+
+
+<app-page-head
+  eyebrow="Resident"
+  [meta]="mine.state() === 'ready' ? mine.data().length + ' reports' : ''"
+  title="Your reports."
+  lead="Everything you have reported, and where it stands."
+>
+  <a appLink="/resident/reports/new" appMagnetic class="btn btn-solid">New report</a>
+</app-page-head>
+
+<app-load-state [state]="mine.state()" [error]="mine.error()" (retry)="mine.reload()" />
+
+@if (mine.state() === 'ready') {
+  
+  @if (toRate().length) {
+    <section class="container-x mb-8" data-testid="to-rate">
+      <a [appLink]="'/reports/' + toRate()[0].id" linkLabel="Report" class="text-title u-link">
+        {{ toRate().length === 1 ? 'A volunteer finished your report.' : toRate().length + ' of your reports are finished.' }} Rate their work →
+      </a>
+    </section>
+  }
+  
+  @if (mine.data().length) {
+    
+    <section class="container-x mb-8 grid gap-6" aria-label="Search and filters" data-testid="filters">
+      <div class="flex flex-wrap items-end gap-x-6 gap-y-5">
+        <app-search-box class="grow md:max-w-md" label="Search your reports" placeholder="Title, place or #number" testId="mine-search" [value]="q()" (valueChange)="q.set($event)" />
+      </div>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by status">
+        @for (s of statuses; track s.value) {
+          <button type="button" class="chip" [attr.data-testid]="'status-' + (s.value || 'all')" [attr.aria-pressed]="status() === s.value" (click)="status.set(s.value)">{{ s.label }}</button>
+        }
+      </div>
+      <app-result-bar [shown]="shown().length" [total]="shown().length" noun="reports" [filtered]="active()" (clear)="clear()" />
+    </section>
+    <app-report-list [reports]="shown()" emptyTitle="Nothing matches that search." emptyText="Try fewer words, or press “Clear filters”." />
+  } @else {
+    <section class="container-x hairline-t py-16">
+      <p class="text-headline">Nothing reported yet.</p>
+      <p class="text-title mt-4 max-w-[28ch] opacity-80">Spotted a problem near you? Pin it and let volunteers know.</p>
+    </section>
+  }
+}
