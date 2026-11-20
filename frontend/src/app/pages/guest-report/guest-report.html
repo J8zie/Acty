@@ -49,7 +49,7 @@
                 <app-field-error [control]="form.controls.lastName" label="Last name" [server]="server().lastName ?? ''" /></label>
             </div>
             <label class="field"><span class="label">Mobile number</span>
-              <input class="input" type="tel" inputmode="tel" autocomplete="tel" formControlName="phone" maxlength="30" data-testid="guest-phone" placeholder="0917 123 4567" [attr.aria-invalid]="bad('phone')" />
+              <input class="input" type="tel" inputmode="numeric" autocomplete="tel" formControlName="phone" maxlength="15" data-testid="guest-phone" placeholder="09123456789" [attr.aria-invalid]="bad('phone')" />
               <span class="label opacity-60">An admin may call or text to confirm your report.</span>
               <app-field-error [control]="form.controls.phone" label="Mobile number" [server]="server().phone ?? ''" /></label>
             <label class="field"><span class="label">Email (optional)</span>

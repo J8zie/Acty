@@ -13,6 +13,7 @@ import { LinkDirective, MagneticDirective } from '../../directives';
 import { errorMessage, fieldErrors } from '../../api/http';
 import { loader } from '../../lib/loader';
 import { pickRandom } from '../../lib/live-photo';
+import { reverseBarangay } from '../../lib/geocode';
 import { emailAddress, personName, phoneNumber } from '../../lib/validators';
 import { ASSISTANCE_LABELS, AssistanceType, URGENCY_LABELS, Urgency } from '../../models';
 import { ConfirmService } from '../../services/confirm.service';
@@ -121,7 +122,7 @@ export class GuestReport {
 
     firstName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(60), personName]],
     lastName: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(60), personName]],
-    phone: ['', [Validators.required, Validators.maxLength(30), phoneNumber]],
+    phone: ['', [Validators.required, Validators.maxLength(15), phoneNumber]],
     email: ['', [Validators.maxLength(255), emailAddress]],
     homeBarangay: ['', Validators.required],
     title: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(120)]],
@@ -216,7 +217,13 @@ export class GuestReport {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => this.position.set({ lat: +pos.coords.latitude.toFixed(6), lng: +pos.coords.longitude.toFixed(6) }),
+      (pos) => {
+        const at = { lat: +pos.coords.latitude.toFixed(6), lng: +pos.coords.longitude.toFixed(6) };
+        this.position.set(at);
+        void reverseBarangay(at.lat, at.lng).then((b) => {
+          if (b) this.form.controls.barangay.setValue(b);
+        });
+      },
       () => this.geoError.set('Could not get your location. Tap the map instead.'),
       { enableHighAccuracy: true, timeout: 8000 },
     );
@@ -229,6 +236,7 @@ export class GuestReport {
     this.position.set(null);
     this.problemShot.set(null);
     this.selfieShot.set(null);
+    this.videoFile.set(null);
     this.step.set(0);
     this.receipt.set(null);
     this.motion.scrollTo(0);

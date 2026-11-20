@@ -38,6 +38,7 @@ export class MyTasks {
 
   protected readonly note = signal('');
   protected readonly photo = signal<File | null>(null);
+  protected readonly video = signal<File | null>(null);
 
   protected readonly steps = [
     { key: 'accepted', label: 'Accepted' },
@@ -60,6 +61,7 @@ export class MyTasks {
   protected openForm(id: string): void {
     this.note.set('');
     this.photo.set(null);
+    this.video.set(null);
     this.completing.set(id);
   }
 
@@ -88,12 +90,12 @@ export class MyTasks {
     const sure = await this.confirmer.confirm({
       title: 'Mark this task as finished?',
       message: 'The request becomes resolved and the resident can rate your work. This cannot be undone.',
-      details: [r.title, this.photo() ? 'With a photo of the result' : 'Without a photo'],
+      details: [r.title, this.photo() ? 'With a photo of the result' : this.video() ? 'With a video of the result' : 'Without photo or video'],
       confirmLabel: 'Finish task',
       cancelLabel: 'Not yet',
     });
     if (!sure) return;
-    await this.run(r, () => this.api.complete(r.id, note || 'Work completed.', this.photo()));
+    await this.run(r, () => this.api.complete(r.id, note || 'Work completed.', this.photo(), this.video()));
     if (!this.problem()) this.completing.set(null);
   }
 

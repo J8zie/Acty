@@ -27,6 +27,7 @@ export interface TaskDto {
   completed_at?: string | null;
   outcome_note?: string | null;
   outcome_image_url?: string | null;
+  outcome_video_url?: string | null;
   rating?: number | null;
 }
 

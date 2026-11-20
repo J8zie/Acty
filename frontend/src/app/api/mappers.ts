@@ -94,6 +94,7 @@ export function toReport(d: ReportDto): Report {
     rating: task?.rating ?? undefined,
     outcomeNote: task?.outcome_note ?? undefined,
     outcomeImageUrl: task?.outcome_image_url ?? undefined,
+    outcomeVideoUrl: task?.outcome_video_url ?? undefined,
   };
 }
 

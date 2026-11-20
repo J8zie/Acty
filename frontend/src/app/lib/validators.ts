@@ -4,8 +4,8 @@ import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 export const NAME_PATTERN = /^[\p{L}\p{M}][\p{L}\p{M}\s.'’-]*$/u;
 /** Letters, digits and underscore. Backend: App\Rules\Patterns::USERNAME */
 export const USERNAME_PATTERN = /^[A-Za-z0-9_]+$/;
-/** "+63 912 345 6789", "0912-345-6789", "(082) 221-1234". Backend: App\Rules\PhoneNumber */
-export const PHONE_SHAPE = /^\+?\(?[0-9][0-9 ()\-.]*$/;
+/** Digits only, 7-15 long. Backend: App\Rules\PhoneNumber */
+export const PHONE_SHAPE = /^\d+$/;
 
 const text = (c: AbstractControl): string => String(c.value ?? '').trim();
 
@@ -61,7 +61,7 @@ export function validationMessage(control: AbstractControl | null, label: string
   if (e['maxlength']) return `${label} must be at most ${e['maxlength'].requiredLength} characters.`;
   if (e['personName']) return `${label} may only contain letters, spaces, dots, apostrophes and hyphens.`;
   if (e['usernameFormat']) return `${label} may only contain letters, numbers and underscores.`;
-  if (e['phoneNumber']) return 'Enter a phone number like 0912 345 6789 or +63 912 345 6789.';
+  if (e['phoneNumber']) return 'Enter a phone number with digits only, like 09123456789.';
   if (e['emailAddress'] || e['email']) return 'Enter a valid email address, like name@example.com.';
   if (e['passwordShort']) return `${label} must be at least 8 characters.`;
   if (e['passwordLong']) return `${label} must be at most 72 characters.`;

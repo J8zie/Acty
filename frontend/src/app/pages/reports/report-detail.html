@@ -127,6 +127,9 @@
         <img [src]="r.outcomeImageUrl" alt="Photo of the finished work" />
       </div>
     }
+    @if (r.outcomeVideoUrl; as video) {
+      <video [src]="video" controls playsinline class="mt-6 aspect-video w-full max-w-xl bg-black"></video>
+    }
   </section>
 
   

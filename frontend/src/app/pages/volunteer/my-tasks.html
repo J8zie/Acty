@@ -52,6 +52,7 @@
                   <textarea class="input" rows="3" maxlength="1000" data-testid="complete-note" placeholder="Cleared the drain and bagged the waste." [value]="note()" (input)="note.set($any($event.target).value)"></textarea>
                   <span class="label opacity-60">{{ note().length }} / 1000</span></label>
                 <app-file-drop title="Add a photo of the result" (chosen)="photo.set($event)" />
+                <app-file-drop kind="video" title="Add a video of the result" (chosen)="video.set($event)" />
                 <div class="flex flex-wrap gap-3 md:col-span-2">
                   <button type="button" class="btn btn-solid" [disabled]="pending() === r.id" (click)="finish(r)">
                     {{ pending() === r.id ? 'Sending…' : 'Confirm complete' }}

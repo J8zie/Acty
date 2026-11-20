@@ -243,11 +243,12 @@ export class ReportsService {
 
 
 
-  async complete(id: string, note: string, photo?: File | null): Promise<Report> {
+  async complete(id: string, note: string, photo?: File | null, video?: File | null): Promise<Report> {
     const form = new FormData();
     form.set('note', note);
     form.set('confirm', '1');
     if (photo) form.set('photo', photo);
+    if (video) form.set('video', video);
     return one(await firstValueFrom(this.http.post<ReportDto | { data: ReportDto }>(url(`/reports/${id}/complete`), form)));
   }
 

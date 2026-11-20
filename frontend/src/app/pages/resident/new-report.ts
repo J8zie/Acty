@@ -10,6 +10,7 @@ import { config } from '../../config';
 import { BARANGAYS } from '../../data/barangays';
 import { MagneticDirective } from '../../directives';
 import { errorMessage, fieldErrors } from '../../api/http';
+import { reverseBarangay } from '../../lib/geocode';
 import { loader } from '../../lib/loader';
 import { ASSISTANCE_LABELS, AssistanceType, URGENCY_LABELS, Urgency } from '../../models';
 import { PageTransitionService } from '../../services/page-transition.service';
@@ -107,7 +108,13 @@ export class NewReport {
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => this.position.set({ lat: +pos.coords.latitude.toFixed(6), lng: +pos.coords.longitude.toFixed(6) }),
+      (pos) => {
+        const at = { lat: +pos.coords.latitude.toFixed(6), lng: +pos.coords.longitude.toFixed(6) };
+        this.position.set(at);
+        void reverseBarangay(at.lat, at.lng).then((b) => {
+          if (b) this.form.controls.barangay.setValue(b);
+        });
+      },
       () => this.geoError.set('Could not get your location. Tap the map instead.'),
       { enableHighAccuracy: true, timeout: 8000 },
     );

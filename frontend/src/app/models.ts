@@ -88,6 +88,7 @@ export interface Report {
 
   outcomeNote?: string;
   outcomeImageUrl?: string;
+  outcomeVideoUrl?: string;
 }
 
 export interface RankedVolunteer {
