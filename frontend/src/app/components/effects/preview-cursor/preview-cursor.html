@@ -9,7 +9,7 @@
     aria-hidden="true"
   >
     
-    <div class="duotone aspect-[4/5] w-full" [class.no-image]="failed() === preview.state().src">
+    <div class="duotone natural aspect-[4/5] w-full" [class.no-image]="failed() === preview.state().src">
       <img [src]="preview.state().src" alt="" (error)="failed.set(preview.state().src)" />
     </div>
     
