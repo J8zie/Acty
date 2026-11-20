@@ -195,6 +195,7 @@ final class ImageStore
             'operation' => $operation,
             'provider' => $provider,
             'exception_class' => $exception::class,
+            'exception_message' => mb_substr($exception->getMessage(), 0, 300),
         ]);
     }
 
