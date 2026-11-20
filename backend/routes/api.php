@@ -50,7 +50,7 @@ Route::get('reports/{report}', [ReportController::class, 'show']);
 // A private picture. No token (an <img> tag cannot send one): the signed, short-lived address is the key.
 Route::get('reports/{report}/private/{kind}', [ImageController::class, 'private'])
 
-    ->whereIn('kind', ['photo', 'selfie'])
+    ->whereIn('kind', ['photo', 'selfie', 'video'])
     ->middleware('signed:relative')
     ->name('reports.private');
 

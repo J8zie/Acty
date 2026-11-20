@@ -29,6 +29,7 @@ class StoreReportRequest extends FormRequest
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:'.config('actify.images.max_kb')],
+            'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime', 'max:'.((int) config('actify.videos.max_mb') * 1024)],
         ];
     }
 
@@ -43,6 +44,8 @@ class StoreReportRequest extends FormRequest
             'longitude.between' => 'The map position is not valid. Tap the map again.',
             'photo.mimes' => 'The photo must be a JPG, PNG or WebP file.',
             'photo.max' => 'The photo is too big (the limit is '.(int) (config('actify.images.max_kb') / 1024).' MB).',
+            'video.mimetypes' => 'The video must be an MP4, WebM or MOV file.',
+            'video.max' => 'The video is too big (the limit is '.(int) config('actify.videos.max_mb').' MB).',
         ];
     }
 }

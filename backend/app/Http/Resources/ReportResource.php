@@ -2,8 +2,9 @@
 
 namespace App\Http\Resources;
 
-use App\Support\PrivateUrl;
 use App\Support\ImageStore;
+use App\Support\PrivateUrl;
+use App\Support\VideoStore;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -28,6 +29,7 @@ class ReportResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'image_url' => $this->imageUrl($isAdmin),
+            'video_url' => $this->videoUrl($isAdmin),
             'created_at' => $this->created_at?->toISOString(),
             'user_id' => $this->user_id,
             'user' => $this->whenLoaded('user', fn () => $this->user ? [
@@ -59,5 +61,19 @@ class ReportResource extends JsonResource
         }
 
         return app(ImageStore::class)->url($this->image_path, 'public');
+    }
+
+    // Finds the right video link, or a signed one for admins only.
+    private function videoUrl(bool $isAdmin): ?string
+    {
+        if (! $this->video_path) {
+            return null;
+        }
+
+        if ($this->video_disk === 'private') {
+            return $isAdmin ? PrivateUrl::for($this->id, 'video') : null;
+        }
+
+        return app(VideoStore::class)->url($this->video_path, 'public');
     }
 }

@@ -12,41 +12,43 @@ class FakeCloudinaryImageGateway implements CloudinaryImageGateway
 
     public bool $failDeletions = false;
 
-
     public array $deletedPublicIds = [];
-
 
     public array $uploadedPublicIds = [];
 
-
-    public function upload(string $jpegBytes, string $publicId): array
+    public function upload(string $bytes, string $publicId, string $resourceType = 'image', string $mime = 'image/jpeg'): array
     {
         if ($this->failUploads) {
             throw new RuntimeException('Simulated Cloudinary upload failure.');
         }
 
-        Storage::disk('public')->put($this->storagePath($publicId), $jpegBytes);
+        $extension = $resourceType === 'video' ? '.mp4' : '.jpg';
+        Storage::disk('public')->put($this->storagePath($publicId, $extension), $bytes);
         $this->uploadedPublicIds[] = $publicId;
 
         return [
             'public_id' => $publicId,
-            'secure_url' => $this->secureUrl($publicId),
+            'secure_url' => $this->secureUrl($publicId, $resourceType),
         ];
     }
 
-    public function delete(string $publicId): void
+    public function delete(string $publicId, string $resourceType = 'image'): void
     {
         if ($this->failDeletions) {
             throw new RuntimeException('Simulated Cloudinary deletion failure.');
         }
 
-        Storage::disk('public')->delete($this->storagePath($publicId));
+        $extension = $resourceType === 'video' ? '.mp4' : '.jpg';
+        Storage::disk('public')->delete($this->storagePath($publicId, $extension));
         $this->deletedPublicIds[] = $publicId;
     }
 
-    public function secureUrl(string $publicId): string
+    public function secureUrl(string $publicId, string $resourceType = 'image'): string
     {
-        return 'https://res.cloudinary.com/actify-test/image/upload/'.$publicId.'.jpg';
+        $delivery = $resourceType === 'video' ? 'video' : 'image';
+        $extension = $resourceType === 'video' ? '' : '.jpg';
+
+        return 'https://res.cloudinary.com/actify-test/'.$delivery.'/upload/'.$publicId.$extension;
     }
 
     public function existsForReference(string $reference): bool
@@ -66,8 +68,8 @@ class FakeCloudinaryImageGateway implements CloudinaryImageGateway
             : $reference;
     }
 
-    private function storagePath(string $publicId): string
+    private function storagePath(string $publicId, string $extension = '.jpg'): string
     {
-        return $publicId.'.jpg';
+        return $publicId.$extension;
     }
 }

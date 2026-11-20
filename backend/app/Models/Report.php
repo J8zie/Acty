@@ -8,7 +8,6 @@ use App\Enums\ReportStatus;
 use App\Enums\ReviewStatus;
 use App\Enums\Urgency;
 use App\Support\StatsCache;
-use Database\Factories\ReportFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,12 +17,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 // A problem someone reported that volunteers can help with.
 class Report extends Model
 {
-
     use HasFactory;
 
     protected $fillable = [
         'user_id', 'category_id', 'title', 'description', 'assistance_type', 'urgency', 'status', 'barangay',
-        'latitude', 'longitude', 'image_path', 'image_disk', 'source', 'review_status', 'reference',
+        'latitude', 'longitude', 'image_path', 'image_disk', 'video_path', 'video_disk', 'source', 'review_status', 'reference',
     ];
 
     // Tells Laravel which fields get special treatment.
@@ -56,7 +54,6 @@ class Report extends Model
         return $this->belongsTo(Category::class);
     }
 
-
     // The account that filed this report, if any.
     public function user(): BelongsTo
     {
@@ -69,13 +66,11 @@ class Report extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
-
     // The volunteer task attached to this report.
     public function task(): HasOne
     {
         return $this->hasOne(ReportTask::class);
     }
-
 
     // The guest's contact details, if this came from a guest.
     public function guestReporter(): HasOne
@@ -89,20 +84,17 @@ class Report extends Model
         return $this->source === ReportSource::Guest;
     }
 
-
     // Checks if this report passed admin review and is public.
     public function isPublic(): bool
     {
         return $this->review_status === ReviewStatus::Approved;
     }
 
-
     // Only shows reports an admin approved.
     public function scopeApproved(Builder $query): void
     {
         $query->where('review_status', ReviewStatus::Approved->value);
     }
-
 
     // Loads the relations the API answer needs onto this report.
     public function loadApiRelations(bool $withReporter = false): static
@@ -114,7 +106,6 @@ class Report extends Model
             ...($withReporter ? ['guestReporter'] : []),
         ]);
     }
-
 
     // Eager-loads the relations the API answer needs in a list query.
     public function scopeWithApiRelations(Builder $query, bool $withReporter = false): void

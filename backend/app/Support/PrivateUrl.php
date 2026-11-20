@@ -10,14 +10,11 @@ final class PrivateUrl
     // Builds a signed link to a report's private photo or selfie.
     public static function for(int $reportId, string $kind): string
     {
-        $relative = URL::temporarySignedRoute(
+        return URL::temporarySignedRoute(
             'reports.private',
             now()->addMinutes((int) config('actify.private_link_minutes')),
             ['report' => $reportId, 'kind' => $kind],
             absolute: false,
         );
-
-
-        return rtrim((string) config('app.url'), '/').$relative;
     }
 }

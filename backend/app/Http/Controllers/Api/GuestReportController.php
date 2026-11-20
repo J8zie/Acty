@@ -10,6 +10,7 @@ use App\Http\Requests\GuestReportRequest;
 use App\Models\GuestReporter;
 use App\Models\Report;
 use App\Support\ImageStore;
+use App\Support\VideoStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -18,24 +19,28 @@ use Throwable;
 class GuestReportController extends Controller
 {
     // Saves a guest's report, photos and contact details.
-    public function store(GuestReportRequest $request, ImageStore $images): JsonResponse
+    public function store(GuestReportRequest $request, ImageStore $images, VideoStore $videos): JsonResponse
     {
         $data = $request->validated();
         $phoneKey = GuestReporter::phoneKey($data['phone']);
 
         $this->enforceLimits($request->ip(), $phoneKey);
 
-
         $photo = $images->storeReportPhoto($request->file('photo'), 'private', 'guest-reports', 'photo');
+        $video = null;
         try {
+            $video = $request->hasFile('video')
+                ? $videos->storeReportVideo($request->file('video'), 'private', 'guest-reports', 'video')
+                : null;
             $selfie = $images->storeSelfie($request->file('selfie'));
         } catch (Throwable $e) {
             $images->delete($photo->path, $photo->disk);
+            $videos->delete($video?->path, $video?->disk ?? 'private');
             throw $e;
         }
 
         try {
-            $report = DB::transaction(function () use ($data, $request, $phoneKey, $photo, $selfie) {
+            $report = DB::transaction(function () use ($data, $request, $phoneKey, $photo, $selfie, $video) {
                 $report = Report::create([
                     'user_id' => null,
                     'category_id' => $data['category_id'],
@@ -51,6 +56,8 @@ class GuestReportController extends Controller
                     'review_status' => ReviewStatus::Pending,
                     'image_path' => $photo->path,
                     'image_disk' => $photo->disk,
+                    'video_path' => $video?->path,
+                    'video_disk' => $video?->disk,
                     'reference' => $this->newReference(),
                 ]);
 
@@ -77,6 +84,7 @@ class GuestReportController extends Controller
         } catch (Throwable $e) {
             $images->delete($photo->path, $photo->disk);
             $images->delete($selfie->path, $selfie->disk);
+            $videos->delete($video?->path, $video?->disk ?? 'private');
             throw $e;
         }
 
@@ -85,7 +93,6 @@ class GuestReportController extends Controller
             'message' => "Thank you. Your report was received and will appear once an admin has checked it. Your reference is {$report->reference}.",
         ], 201);
     }
-
 
     // Stops people from sending too many guest reports.
     private function enforceLimits(?string $ip, string $phoneKey): void
@@ -100,7 +107,6 @@ class GuestReportController extends Controller
             throw $this->error('You have sent too many reports. Please try again later.', 429);
         }
     }
-
 
     // Makes a new short reference code for the report.
     private function newReference(): string

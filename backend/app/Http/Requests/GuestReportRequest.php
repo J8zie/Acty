@@ -34,7 +34,6 @@ class GuestReportRequest extends FormRequest
             'email' => ['nullable', 'string', 'email:rfc', 'max:255'],
             'reporter_barangay' => ['required', 'string', 'max:80'],
 
-
             'title' => ['required', 'string', 'min:5', 'max:120'],
             'description' => ['required', 'string', 'min:15', 'max:2000'],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
@@ -44,7 +43,6 @@ class GuestReportRequest extends FormRequest
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
 
-
             'photo' => $image,
             'photo_capture_method' => ['required', $methods],
             'photo_captured_at' => ['required', new CaptureTime($this->input('photo_capture_method'))],
@@ -52,6 +50,8 @@ class GuestReportRequest extends FormRequest
             'selfie_capture_method' => ['required', $methods],
             'selfie_captured_at' => ['required', new CaptureTime($this->input('selfie_capture_method'))],
             'liveness_prompt' => ['required', 'string', 'max:120'],
+
+            'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime', 'max:'.((int) config('actify.videos.max_mb') * 1024)],
 
             'consent' => ['required', 'accepted'],
         ];
@@ -70,6 +70,8 @@ class GuestReportRequest extends FormRequest
             'photo.mimes' => 'The photo must be a JPG, PNG or WebP file.',
             'selfie.mimes' => 'The selfie must be a JPG, PNG or WebP file.',
             'consent.required' => 'Please tick the box to agree before sending.',
+            'video.mimetypes' => 'The video must be an MP4, WebM or MOV file.',
+            'video.max' => 'The video is too big (the limit is '.(int) config('actify.videos.max_mb').' MB).',
             'consent.accepted' => 'Please tick the box to agree before sending.',
         ];
     }

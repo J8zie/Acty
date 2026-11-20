@@ -2,9 +2,7 @@
 
 return [
 
-
     'api_rate_per_minute' => (int) env('ACTIFY_API_RATE_PER_MINUTE', 120),
-
 
     'login_per_minute' => 5,
 
@@ -24,7 +22,6 @@ return [
         'rejected_retention_days' => 30,
     ],
 
-
     'max_active_tasks' => (int) env('ACTIFY_MAX_ACTIVE_TASKS', 5),
 
     'images' => [
@@ -39,12 +36,16 @@ return [
         'jpeg_quality' => 85,
     ],
 
+    'videos' => [
+
+        'max_mb' => 50,
+
+        'mimes' => ['mp4', 'webm', 'quicktime'],
+    ],
 
     'private_link_minutes' => 15,
 
-
     'stats_cache_seconds' => 30,
-
 
     'pagination' => [
         'default' => 100,

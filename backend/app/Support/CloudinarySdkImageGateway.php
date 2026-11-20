@@ -5,19 +5,19 @@ namespace App\Support;
 use Cloudinary\Cloudinary;
 use RuntimeException;
 
-// Talks to Cloudinary to store and serve pictures.
+// Talks to Cloudinary to store and serve pictures and videos.
 final class CloudinarySdkImageGateway implements CloudinaryImageGateway
 {
     private ?Cloudinary $client = null;
 
-    // Uploads the image bytes and returns its Cloudinary ids.
-    public function upload(string $jpegBytes, string $publicId): array
+    // Uploads the bytes and returns its Cloudinary ids.
+    public function upload(string $bytes, string $publicId, string $resourceType = 'image', string $mime = 'image/jpeg'): array
     {
         $result = $this->client()->uploadApi()->upload(
-            'data:image/jpeg;base64,'.base64_encode($jpegBytes),
+            'data:'.$mime.';base64,'.base64_encode($bytes),
             [
                 'public_id' => $publicId,
-                'resource_type' => 'image',
+                'resource_type' => $resourceType,
                 'overwrite' => false,
             ],
         );
@@ -28,22 +28,22 @@ final class CloudinarySdkImageGateway implements CloudinaryImageGateway
         ];
     }
 
-    // Deletes an image from Cloudinary.
-    public function delete(string $publicId): void
+    // Deletes a file from Cloudinary.
+    public function delete(string $publicId, string $resourceType = 'image'): void
     {
         $result = $this->client()->uploadApi()->destroy($publicId, [
-            'resource_type' => 'image',
+            'resource_type' => $resourceType,
             'invalidate' => true,
         ]);
         $status = (string) ($result['result'] ?? '');
 
         if (! in_array($status, ['ok', 'deleted', 'not found'], true)) {
-            throw new RuntimeException('Cloudinary did not confirm image deletion.');
+            throw new RuntimeException('Cloudinary did not confirm file deletion.');
         }
     }
 
-    // Builds the web address for an uploaded image.
-    public function secureUrl(string $publicId): string
+    // Builds the web address for an uploaded file.
+    public function secureUrl(string $publicId, string $resourceType = 'image'): string
     {
         $cloudName = config('services.cloudinary.cloud_name')
             ?: parse_url((string) config('services.cloudinary.url'), PHP_URL_HOST);
@@ -53,8 +53,10 @@ final class CloudinarySdkImageGateway implements CloudinaryImageGateway
         }
 
         $encodedPublicId = implode('/', array_map('rawurlencode', explode('/', $publicId)));
+        $delivery = $resourceType === 'video' ? 'video' : 'image';
+        $extension = $resourceType === 'video' ? '' : '.jpg';
 
-        return 'https://res.cloudinary.com/'.$cloudName.'/image/upload/'.$encodedPublicId.'.jpg';
+        return 'https://res.cloudinary.com/'.$cloudName.'/'.$delivery.'/upload/'.$encodedPublicId.$extension;
     }
 
     // Gets the Cloudinary client, making it on first use.

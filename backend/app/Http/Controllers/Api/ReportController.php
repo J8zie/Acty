@@ -14,6 +14,7 @@ use App\Http\Resources\ReportResource;
 use App\Models\Report;
 use App\Queries\ReportSearch;
 use App\Support\ImageStore;
+use App\Support\VideoStore;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -24,7 +25,6 @@ use Throwable;
 // Lists, shows, creates, edits and deletes reports.
 class ReportController extends Controller
 {
-
     // Lists reports with filters, search and paging.
     public function index(ListReportsRequest $request): JsonResponse
     {
@@ -48,7 +48,6 @@ class ReportController extends Controller
             ->withHeaders($this->pagingHeaders($total, $page, $limit));
     }
 
-
     // Shows one report if the person may see it.
     public function show(Request $request, Report $report): ReportResource
     {
@@ -61,12 +60,12 @@ class ReportController extends Controller
         return new ReportResource($report->loadApiRelations(withReporter: (bool) $viewer?->isAdmin()));
     }
 
-
     // Creates a report from a signed-in resident.
-    public function store(StoreReportRequest $request, ImageStore $images): JsonResponse
+    public function store(StoreReportRequest $request, ImageStore $images, VideoStore $videos): JsonResponse
     {
         $data = $request->validated();
         $storedImage = $request->hasFile('photo') ? $images->storeReportPhoto($request->file('photo')) : null;
+        $storedVideo = $request->hasFile('video') ? $videos->storeReportVideo($request->file('video')) : null;
 
         try {
             $report = Report::create([
@@ -84,15 +83,17 @@ class ReportController extends Controller
                 'review_status' => ReviewStatus::Approved,
                 'image_path' => $storedImage?->path,
                 'image_disk' => $storedImage?->disk ?? 'public',
+                'video_path' => $storedVideo?->path,
+                'video_disk' => $storedVideo?->disk,
             ]);
         } catch (Throwable $e) {
             $images->delete($storedImage?->path, $storedImage?->disk ?? 'public');
+            $videos->delete($storedVideo?->path, $storedVideo?->disk ?? 'public');
             throw $e;
         }
 
         return (new ReportResource($report->loadApiRelations()))->response()->setStatusCode(201);
     }
-
 
     // Changes a report's status (admin only).
     public function update(UpdateReportStatusRequest $request, Report $report): ReportResource
@@ -122,9 +123,8 @@ class ReportController extends Controller
         return new ReportResource($report->loadApiRelations(withReporter: true));
     }
 
-
     // Deletes a report and all its pictures.
-    public function destroy(ConfirmRequest $request, Report $report, ImageStore $images): Response
+    public function destroy(ConfirmRequest $request, Report $report, ImageStore $images, VideoStore $videos): Response
     {
         $report->loadMissing(['task', 'guestReporter']);
 
@@ -141,6 +141,7 @@ class ReportController extends Controller
         foreach ($files as [$path, $disk]) {
             $images->delete($path, $disk);
         }
+        $videos->delete($report->video_path, $report->video_disk ?? 'public');
 
         return response()->noContent();
     }

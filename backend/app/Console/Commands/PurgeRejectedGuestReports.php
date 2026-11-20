@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Enums\ReviewStatus;
 use App\Models\Report;
 use App\Support\ImageStore;
+use App\Support\VideoStore;
 use Illuminate\Console\Command;
 use RuntimeException;
 
@@ -16,7 +17,7 @@ class PurgeRejectedGuestReports extends Command
     protected $description = 'Delete rejected guest reports (and their pictures) older than the retention period';
 
     // Removes each rejected guest report that is older than the keep period.
-    public function handle(ImageStore $images): int
+    public function handle(ImageStore $images, VideoStore $videos): int
     {
         $days = (int) ($this->option('days') ?? config('actify.guest.rejected_retention_days'));
         $count = 0;
@@ -25,10 +26,12 @@ class PurgeRejectedGuestReports extends Command
             ->with('guestReporter')
             ->where('review_status', ReviewStatus::Rejected->value)
             ->where('reviewed_at', '<', now()->subDays($days))
-            ->each(function (Report $report) use ($images, &$count) {
+            ->each(function (Report $report) use ($images, $videos, &$count) {
                 $photoPath = $report->image_path;
                 $photoDisk = $report->image_disk;
                 $selfiePath = $report->guestReporter?->selfie_path;
+                $videoPath = $report->video_path;
+                $videoDisk = $report->video_disk ?? 'private';
 
                 if (! $report->delete()) {
                     throw new RuntimeException('Unable to delete the rejected guest report.');
@@ -36,6 +39,7 @@ class PurgeRejectedGuestReports extends Command
 
                 $images->delete($photoPath, $photoDisk);
                 $images->delete($selfiePath, 'private');
+                $videos->delete($videoPath, $videoDisk);
                 $count++;
             });
 
