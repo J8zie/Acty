@@ -77,7 +77,7 @@ final class VideoStore
                 }
 
                 $this->logStorageFailure('upload', $e);
-                throw new RuntimeException('Unable to upload the video. Please try again.');
+                throw new RuntimeException('Unable to upload the video. Please try again. ['.$e->getMessage().']');
             }
         }
 

@@ -154,7 +154,7 @@ final class ImageStore
                 }
 
                 $this->logStorageFailure('upload', $e);
-                throw new RuntimeException('Unable to upload the image. Please try again.');
+                throw new RuntimeException('Unable to upload the image. Please try again. ['.$e->getMessage().']');
             }
         }
 
