@@ -6,14 +6,10 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * `->middleware('role:admin')` or `->middleware('role:resident,volunteer')`.
- *
- * Runs after `auth:sanctum`. The Angular app already hides what a role may not do, but hiding a button is not
- * security: this is the check that really keeps a volunteer out of an admin route.
- */
+// Stops requests from people whose role is not allowed.
 class EnsureRole
 {
+    // Checks the user's role against the allowed list.
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
         $user = $request->user();

@@ -12,9 +12,10 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
 
-/** POST /reports/{id}/review { decision: approve|reject, confirm } (admin) */
+// Lets an admin approve or reject a guest report.
 class ReportReviewController extends Controller
 {
+    // Marks a pending guest report as approved or rejected.
     public function __invoke(ReviewReportRequest $request, Report $report, ImageStore $images): ReportResource
     {
         if (! $report->isGuest()) {

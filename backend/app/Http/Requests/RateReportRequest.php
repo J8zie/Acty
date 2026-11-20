@@ -6,16 +6,18 @@ use App\Http\Requests\Concerns\RequiresConfirmation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-/** POST /reports/{id}/rating (the resident who filed the report rates the volunteer, once). */
+// Checks the star rating a resident sends for a finished task.
 class RateReportRequest extends FormRequest
 {
     use RequiresConfirmation;
 
+    // Only the person who filed the report may rate it.
     public function authorize()
     {
         return Gate::inspect('rate', $this->route('report'));
     }
 
+    // The rules the rating must pass.
     public function rules(): array
     {
         return [
@@ -24,6 +26,7 @@ class RateReportRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for the rating errors.
     public function messages(): array
     {
         return [

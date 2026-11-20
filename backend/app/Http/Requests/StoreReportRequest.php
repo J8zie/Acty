@@ -7,14 +7,16 @@ use App\Enums\Urgency;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** POST /reports (a signed-in resident files a report). */
+// Checks the details sent when a resident files a report.
 class StoreReportRequest extends FormRequest
 {
+    // Only signed-in residents reach this.
     public function authorize(): bool
     {
-        return true; // `role:resident` on the route
+        return true;
     }
 
+    // The rules every report field must pass.
     public function rules(): array
     {
         return [
@@ -30,6 +32,7 @@ class StoreReportRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for some of the error messages.
     public function messages(): array
     {
         return [

@@ -8,17 +8,16 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-/**
- * PATCH /auth/me. Changing the EMAIL is sensitive (it is how an account is recovered), so it also needs the
- * current password: a stolen, still-logged-in browser cannot silently take over the account.
- */
+// Checks the details sent when a person edits their profile.
 class UpdateProfileRequest extends FormRequest
 {
+    // The signed-in person may update their own profile.
     public function authorize(): bool
     {
         return true;
     }
 
+    // Tidies the email before it is checked.
     protected function prepareForValidation(): void
     {
         if (is_string($this->email)) {
@@ -26,6 +25,7 @@ class UpdateProfileRequest extends FormRequest
         }
     }
 
+    // The rules the profile form must pass.
     public function rules(): array
     {
         return [
@@ -36,6 +36,7 @@ class UpdateProfileRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for some of the error messages.
     public function messages(): array
     {
         return [
@@ -45,6 +46,7 @@ class UpdateProfileRequest extends FormRequest
         ];
     }
 
+    // Asks for the current password when the email is being changed.
     public function after(): array
     {
         return [function (Validator $validator) {

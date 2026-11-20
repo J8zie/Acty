@@ -9,28 +9,16 @@ use Closure;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/**
- * GET /reports?... : every way the Reports page, the volunteer "Nearby" page and the admin table can narrow a list.
- *
- *   q             words to search for (all words must match the title, description, barangay or category; "#12" or "12" = report number)
- *   status        one status or several separated by commas: open,in_progress
- *   category_id   one category
- *   urgency       low | medium | high (commas for several)
- *   assistance_type   cleanup | repair | supplies | manpower | awareness | other (commas for several)
- *   barangay      exact barangay name
- *   from, to      created between two dates (YYYY-MM-DD, both included)
- *   sort          newest (default) | oldest | urgency | status
- *   scope         mine | tasks     (needs a token)
- *   review        pending          (admin: guest reports waiting for approval)
- *   limit, page   paging (default 100 per page, at most 200)
- */
+// Checks the filters and paging sent when listing reports.
 class ListReportsRequest extends FormRequest
 {
+    // Anyone may list reports.
     public function authorize(): bool
     {
         return true;
     }
 
+    // The rules every filter must pass.
     public function rules(): array
     {
         return [
@@ -50,6 +38,7 @@ class ListReportsRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for the date errors.
     public function messages(): array
     {
         return [
@@ -59,13 +48,15 @@ class ListReportsRequest extends FormRequest
         ];
     }
 
-    /** "open,in_progress" -> ['open', 'in_progress'] (empty when the filter is not used). */
+
+    // Splits a comma-separated filter into a clean list.
     public function list(string $key): array
     {
         return array_values(array_filter(array_map('trim', explode(',', (string) $this->query($key, '')))));
     }
 
-    /** A rule that accepts "a" or "a,b" when every part is one of the allowed values. */
+
+    // Makes a rule that only allows the given comma-separated values.
     private function csvOf(array $allowed): Closure
     {
         return function (string $attribute, mixed $value, Closure $fail) use ($allowed): void {

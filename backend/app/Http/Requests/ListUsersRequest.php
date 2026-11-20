@@ -6,14 +6,16 @@ use App\Enums\Role;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** GET /admin/users?q=&role=&sort=&limit=&page= (the People page). */
+// Checks the search, filter and paging sent when an admin lists users.
 class ListUsersRequest extends FormRequest
 {
+    // The route already limits this to admins.
     public function authorize(): bool
     {
-        return true; // `role:admin` on the route
+        return true;
     }
 
+    // The rules every filter must pass.
     public function rules(): array
     {
         return [

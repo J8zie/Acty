@@ -7,16 +7,18 @@ use App\Http\Requests\Concerns\RequiresConfirmation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** PATCH /admin/users/{id}: change somebody's role. Powerful (a new admin can do everything), so it is confirmed. */
+// Checks the new role an admin sends for a user.
 class UpdateUserRoleRequest extends FormRequest
 {
     use RequiresConfirmation;
 
+    // The route already limits this to admins.
     public function authorize(): bool
     {
-        return true; // `role:admin` on the route
+        return true;
     }
 
+    // The rules the role change must pass.
     public function rules(): array
     {
         return [
@@ -25,6 +27,7 @@ class UpdateUserRoleRequest extends FormRequest
         ];
     }
 
+    // The confirm error messages.
     public function messages(): array
     {
         return $this->confirmationMessages();

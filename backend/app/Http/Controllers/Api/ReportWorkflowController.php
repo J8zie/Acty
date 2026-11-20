@@ -19,18 +19,11 @@ use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Throwable;
 
-/**
- * The life of a request after it is filed:  accept -> start -> complete -> rating.
- * Each step checks the step before it, so nobody can skip ahead or do it twice.
- */
+// Runs the volunteer workflow: take a report, start, finish, rate.
 class ReportWorkflowController extends Controller
 {
-    /**
-     * POST /reports/{id}/accept (volunteer).
-     * Two volunteers may press Accept at the same instant. The report row is locked while we check and write, and the
-     * database refuses a second task for the same report (unique index), so exactly one of them wins and the other
-     * gets 409 "already taken".
-     */
+
+    // Lets a volunteer take an open report.
     public function accept(Request $request, Report $report): ReportResource
     {
         Gate::authorize('accept', $report);
@@ -71,7 +64,8 @@ class ReportWorkflowController extends Controller
         return $this->fresh($report);
     }
 
-    /** POST /reports/{id}/start (the volunteer who holds the task). accepted -> in_progress. */
+
+    // Marks the volunteer's task as started.
     public function start(Request $request, Report $report): ReportResource
     {
         Gate::authorize('work', $report);
@@ -88,7 +82,8 @@ class ReportWorkflowController extends Controller
         return $this->fresh($report);
     }
 
-    /** POST /reports/{id}/complete { note, photo?, confirm }. in_progress -> complete; the report becomes resolved. */
+
+    // Marks the task finished, optionally with a photo, and resolves the report.
     public function complete(CompleteTaskRequest $request, Report $report, ImageStore $images): ReportResource
     {
         $task = $report->task;
@@ -141,11 +136,8 @@ class ReportWorkflowController extends Controller
         return $this->fresh($report);
     }
 
-    /**
-     * POST /reports/{id}/rating { rating 1-5, confirm } (the resident who filed it).
-     * Only once the work is complete, and only once: a rating cannot be changed afterwards (that is why the app
-     * asks "Are you sure?" first).
-     */
+
+    // Lets the resident rate the volunteer once, after the work is done.
     public function rating(RateReportRequest $request, Report $report): ReportResource
     {
         $task = $report->task;
@@ -154,7 +146,7 @@ class ReportWorkflowController extends Controller
             throw ValidationException::withMessages(['rating' => ['You can rate the volunteer once the work is finished.']]);
         }
 
-        // "update where rating is still empty": if two clicks arrive together only one changes a row.
+
         $changed = ReportTask::query()
             ->whereKey($task->id)
             ->whereNull('rating')
@@ -167,6 +159,7 @@ class ReportWorkflowController extends Controller
         return $this->fresh($report);
     }
 
+    // Reloads the report with everything the API answer needs.
     private function fresh(Report $report): ReportResource
     {
         return new ReportResource(Report::query()->withApiRelations()->findOrFail($report->id));

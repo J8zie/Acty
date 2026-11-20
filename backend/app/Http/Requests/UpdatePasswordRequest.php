@@ -7,13 +7,16 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Validator;
 
+// Checks the current and new passwords sent when changing a password.
 class UpdatePasswordRequest extends FormRequest
 {
+    // The signed-in person may change their own password.
     public function authorize(): bool
     {
         return true;
     }
 
+    // The rules the password form must pass.
     public function rules(): array
     {
         return [
@@ -22,6 +25,7 @@ class UpdatePasswordRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for some of the error messages.
     public function messages(): array
     {
         return [
@@ -30,6 +34,7 @@ class UpdatePasswordRequest extends FormRequest
         ];
     }
 
+    // Checks that the current password typed is actually right.
     public function after(): array
     {
         return [function (Validator $validator) {

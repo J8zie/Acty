@@ -11,13 +11,15 @@ use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
 
+// Saves, resizes and deletes the pictures users upload.
 final class ImageStore
 {
     private const CLOUDINARY_PREFIX = 'cloudinary:';
 
+    // Remembers how to talk to Cloudinary.
     public function __construct(private readonly CloudinaryImageGateway $cloudinary) {}
 
-    /** A profile picture: cropped to a square, avatar_px wide. */
+    // A profile picture: cropped to a square, avatar_px wide.
     public function storeAvatar(UploadedFile $file, string $field = 'photo'): ImageStorageResult
     {
         $bytes = $this->encode($file, (int) config('actify.images.avatar_px'), square: true, field: $field);
@@ -25,7 +27,7 @@ final class ImageStore
         return $this->put('public', 'avatars', $bytes);
     }
 
-    /** A photo of a problem or of finished work. */
+    // A photo of a problem or of finished work.
     public function storeReportPhoto(UploadedFile $file, string $disk = 'public', string $directory = 'reports', string $field = 'photo'): ImageStorageResult
     {
         $bytes = $this->encode($file, (int) config('actify.images.report_max_side'), square: false, field: $field);
@@ -33,16 +35,14 @@ final class ImageStore
         return $this->put($disk, $directory, $bytes);
     }
 
-    /** A guest's selfie. Always the private disk. */
+    // A guest's selfie. Always the private disk.
     public function storeSelfie(UploadedFile $file): ImageStorageResult
     {
         return $this->storeReportPhoto($file, 'private', 'guest-selfies', 'selfie');
     }
 
-    /**
-     * Delete either a Cloudinary public asset or a legacy/local filesystem image.
-     * Private guest photos and selfies always remain on the private local disk.
-     */
+    // Delete either a Cloudinary public asset or a legacy/local filesystem image.
+    // Private guest photos and selfies always remain on the private local disk.
     public function delete(?string $path, string $disk = 'public'): bool
     {
         if (! $path) {
@@ -72,10 +72,8 @@ final class ImageStore
         }
     }
 
-    /**
-     * Uploads a pending guest report photo but deliberately keeps its private source until the database update commits.
-     * Legacy pending/ paths remain eligible; selfie paths are never eligible for promotion.
-     */
+    // Uploads a pending guest report photo but deliberately keeps its private source until the database update commits.
+    // Legacy pending/ paths remain eligible; selfie paths are never eligible for promotion.
     public function promoteGuestReportPhoto(string $path): ImageStorageResult
     {
         if (! str_starts_with($path, 'guest-reports/') && ! str_starts_with($path, 'pending/')) {
@@ -96,10 +94,8 @@ final class ImageStore
         return $this->put('public', 'reports', $bytes);
     }
 
-    /**
-     * Return a browser-ready URL. Existing local public paths remain supported,
-     * so images uploaded before the Cloudinary migration continue to display.
-     */
+    // Return a browser-ready URL. Existing local public paths remain supported,
+    // so images uploaded before the Cloudinary migration continue to display.
     public function url(?string $path, string $disk = 'public'): ?string
     {
         if (! $path || $disk === 'private') {
@@ -113,6 +109,7 @@ final class ImageStore
         return Storage::disk($disk)->url($path);
     }
 
+    // Sends the image bytes to Cloudinary or the private disk.
     private function put(string $disk, string $directory, string $bytes): ImageStorageResult
     {
         $uuid = Str::uuid()->toString();
@@ -165,16 +162,19 @@ final class ImageStore
         return new ImageStorageResult($path, 'private');
     }
 
+    // Checks if a stored path points at Cloudinary.
     private function isCloudinaryPath(string $path): bool
     {
         return str_starts_with($path, self::CLOUDINARY_PREFIX);
     }
 
+    // Strips the cloudinary: prefix to get the real Cloudinary id.
     private function cloudinaryPublicId(string $path): string
     {
         return substr($path, strlen(self::CLOUDINARY_PREFIX));
     }
 
+    // Writes a storage problem to the log without leaking secrets.
     private function logStorageFailure(string $operation, Throwable $exception, string $provider = 'cloudinary'): void
     {
         Log::error('Image storage operation failed.', [
@@ -184,7 +184,7 @@ final class ImageStore
         ]);
     }
 
-    /** The decoding / resizing / re-encoding. Returns the bytes of a new JPEG. */
+    // The decoding / resizing / re-encoding. Returns the bytes of a new JPEG.
     public function encode(UploadedFile $file, int $maxSide, bool $square, string $field = 'photo'): string
     {
         $unreadable = ValidationException::withMessages([
@@ -242,7 +242,7 @@ final class ImageStore
         return $bytes;
     }
 
-    /** Phones store "rotate me" in EXIF rather than rotating pixels. Honour it, then EXIF is dropped. */
+    // Turns the photo the right way up when a phone stored a "rotate me" note.
     private function applyExifOrientation(\GdImage $image, string $path, int $type): \GdImage
     {
         if ($type !== IMAGETYPE_JPEG || ! function_exists('exif_read_data')) {

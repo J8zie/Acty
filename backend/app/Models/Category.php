@@ -7,14 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-/** "Flooding", "Road Damage", ... The kinds of problem a report can be about. */
+// A type of problem a report can be about.
 class Category extends Model
 {
-    /** @use HasFactory<CategoryFactory> */
+
     use HasFactory;
 
     protected $fillable = ['name'];
 
+    // The reports filed under this category.
     public function reports(): HasMany
     {
         return $this->hasMany(Report::class);

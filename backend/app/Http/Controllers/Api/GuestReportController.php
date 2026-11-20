@@ -14,17 +14,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-/**
- * POST /reports/guest : a report from somebody WITHOUT an account.
- *
- * What protects it (a form anyone on the internet can post to):
- *   1. validation: names, phone, both pictures present and decodable, capture times close to the server clock, consent;
- *   2. throttles counted in the database: per IP address per hour, and per phone number per day;
- *   3. the report is saved hidden (review_status "pending") and its pictures go to the PRIVATE disk;
- *   4. an admin must approve it before the public can see it (ReportReviewController).
- */
+// Handles reports sent in by guests who have no account.
 class GuestReportController extends Controller
 {
+    // Saves a guest's report, photos and contact details.
     public function store(GuestReportRequest $request, ImageStore $images): JsonResponse
     {
         $data = $request->validated();
@@ -32,7 +25,7 @@ class GuestReportController extends Controller
 
         $this->enforceLimits($request->ip(), $phoneKey);
 
-        // Pictures first (they can still fail: "this file is not a picture"). If the second one fails, drop the first.
+
         $photo = $images->storeReportPhoto($request->file('photo'), 'private', 'guest-reports', 'photo');
         try {
             $selfie = $images->storeSelfie($request->file('selfie'));
@@ -93,7 +86,8 @@ class GuestReportController extends Controller
         ], 201);
     }
 
-    /** 429 when this address or this phone number has sent too many reports recently (rejected ones count too). */
+
+    // Stops people from sending too many guest reports.
     private function enforceLimits(?string $ip, string $phoneKey): void
     {
         $perIp = (int) config('actify.guest.per_ip_per_hour');
@@ -107,7 +101,8 @@ class GuestReportController extends Controller
         }
     }
 
-    /** ACT-123456: short enough to read out on the phone, random so it cannot be guessed from the previous one. */
+
+    // Makes a new short reference code for the report.
     private function newReference(): string
     {
         do {

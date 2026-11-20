@@ -21,15 +21,16 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-/** The People page (admin only). */
+// Lets an admin list, change roles of and remove users.
 class AdminUserController extends Controller
 {
-    /** GET /admin/users?q=&role=&sort=&limit=&page= */
+
+    // Lists users with search, role filter and sorting.
     public function index(ListUsersRequest $request): JsonResponse
     {
         $query = User::query();
 
-        // every word must appear in the username, the name or the email ("maria san" finds Maria Santos)
+
         $words = array_slice(preg_split('/\s+/', trim((string) $request->query('q', '')), -1, PREG_SPLIT_NO_EMPTY) ?: [], 0, 5);
         foreach ($words as $word) {
             $like = Like::contains($word);
@@ -60,11 +61,8 @@ class AdminUserController extends Controller
             ->withHeaders($this->pagingHeaders($total, $page, $limit));
     }
 
-    /**
-     * PATCH /admin/users/{id} { role, confirm }
-     * You cannot change your own role (an admin who demotes themselves could lock everybody out). A volunteer who
-     * stops being a volunteer hands back their unfinished tasks.
-     */
+
+    // Changes a user's role, freeing their tasks if they stop being a volunteer.
     public function update(UpdateUserRoleRequest $request, User $user): UserResource
     {
         $new = Role::from($request->validated('role'));
@@ -87,7 +85,8 @@ class AdminUserController extends Controller
         return new UserResource($user);
     }
 
-    /** DELETE /admin/users/{id} { confirm } -> 204. Their reports stay (shown as "a neighbour"); unfinished tasks are handed back. */
+
+    // Deletes a user account and their unfinished tasks.
     public function destroy(ConfirmRequest $request, User $user, ImageStore $images): Response
     {
         if ($user->is($request->user())) {
@@ -101,7 +100,7 @@ class AdminUserController extends Controller
 
         DB::transaction(function () use ($user) {
             $this->releaseTasks($user);
-            $user->tokens()->delete(); // they are signed out everywhere at once
+            $user->tokens()->delete();
 
             if (! $user->delete()) {
                 throw new RuntimeException('Unable to delete the account.');
@@ -113,12 +112,14 @@ class AdminUserController extends Controller
         return response()->noContent();
     }
 
+    // Checks if this user is the only admin left.
     private function isLastAdmin(): bool
     {
         return User::query()->where('role', Role::Admin->value)->count() <= 1;
     }
 
-    /** Unfinished tasks of this person go back into the open list so another volunteer can take them. */
+
+    // Puts a volunteer's open tasks back so their reports become open again.
     private function releaseTasks(User $user): void
     {
         ReportTask::query()

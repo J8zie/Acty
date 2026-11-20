@@ -2,22 +2,18 @@
 
 namespace App\Http\Requests\Concerns;
 
-/**
- * "Are you sure?" enforced by the server.
- *
- * The Angular app asks the person to confirm important actions (delete, cancel, give a rating...) in a dialog, then
- * sends `confirm: true` with the request. The server insists on it too, so an action that cannot be undone never
- * happens by a stray click, a script, or an old/buggy client that forgot to ask.
- */
+// Shared rules and messages for forms that need a confirm tick.
 trait RequiresConfirmation
 {
-    /** @return array<string, array<int, string>> */
+
+    // The rule that requires the confirm box to be ticked.
     protected function confirmationRules(): array
     {
         return ['confirm' => ['required', 'accepted']];
     }
 
-    /** @return array<string, string> */
+
+    // The error messages for the confirm box.
     protected function confirmationMessages(): array
     {
         return [

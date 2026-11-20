@@ -5,11 +5,12 @@ namespace App\Support;
 use Cloudinary\Cloudinary;
 use RuntimeException;
 
+// Talks to Cloudinary to store and serve pictures.
 final class CloudinarySdkImageGateway implements CloudinaryImageGateway
 {
     private ?Cloudinary $client = null;
 
-    /** @return array{public_id: string, secure_url: string} */
+    // Uploads the image bytes and returns its Cloudinary ids.
     public function upload(string $jpegBytes, string $publicId): array
     {
         $result = $this->client()->uploadApi()->upload(
@@ -27,6 +28,7 @@ final class CloudinarySdkImageGateway implements CloudinaryImageGateway
         ];
     }
 
+    // Deletes an image from Cloudinary.
     public function delete(string $publicId): void
     {
         $result = $this->client()->uploadApi()->destroy($publicId, [
@@ -40,6 +42,7 @@ final class CloudinarySdkImageGateway implements CloudinaryImageGateway
         }
     }
 
+    // Builds the web address for an uploaded image.
     public function secureUrl(string $publicId): string
     {
         $cloudName = config('services.cloudinary.cloud_name')
@@ -54,6 +57,7 @@ final class CloudinarySdkImageGateway implements CloudinaryImageGateway
         return 'https://res.cloudinary.com/'.$cloudName.'/image/upload/'.$encodedPublicId.'.jpg';
     }
 
+    // Gets the Cloudinary client, making it on first use.
     private function client(): Cloudinary
     {
         if ($this->client) {

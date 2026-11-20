@@ -14,15 +14,17 @@ use Laravel\Sanctum\PersonalAccessToken;
 use RuntimeException;
 use Throwable;
 
-/** "My account": the signed-in person's own profile, picture and password. */
+// Lets a signed-in person see and change their own account.
 class AccountController extends Controller
 {
+    // Sends back the logged-in person's details.
     public function show(Request $request): UserResource
     {
         return new UserResource($request->user());
     }
 
-    /** PATCH /auth/me. Changing the email needs `current_password` (see UpdateProfileRequest). */
+
+    // Saves changes to the person's name and email.
     public function update(UpdateProfileRequest $request): UserResource
     {
         $user = $request->user();
@@ -31,7 +33,8 @@ class AccountController extends Controller
         return new UserResource($user);
     }
 
-    /** POST /auth/me/photo (multipart `photo`). The old picture is deleted; the new URL differs, so no stale cache. */
+
+    // Uploads a new profile picture and deletes the old one.
     public function storePhoto(UpdatePhotoRequest $request, ImageStore $images): UserResource
     {
         $user = $request->user();
@@ -54,7 +57,8 @@ class AccountController extends Controller
         return new UserResource($user);
     }
 
-    /** DELETE /auth/me/photo -> the user with photo_url null. */
+
+    // Removes the profile picture.
     public function destroyPhoto(Request $request, ImageStore $images): UserResource
     {
         $user = $request->user();
@@ -70,10 +74,8 @@ class AccountController extends Controller
         return new UserResource($user);
     }
 
-    /**
-     * PUT /auth/me/password. After a change, every OTHER device is signed out (if somebody else had the old
-     * password, they lose access); this device stays signed in.
-     */
+
+    // Changes the password and signs out every other device.
     public function updatePassword(UpdatePasswordRequest $request): Response
     {
         $user = $request->user();

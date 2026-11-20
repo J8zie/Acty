@@ -4,11 +4,13 @@ namespace App\Support;
 
 use Illuminate\Support\Facades\Cache;
 
-/** The landing page numbers (/api/stats) are cached for a few seconds. One place knows the key. */
+// The cached home-page report numbers.
 final class StatsCache
 {
+    // The cache key for the stats.
     public const KEY = 'actify.stats';
 
+    // Throws away the saved stats so they are counted again.
     public static function forget(): void
     {
         Cache::forget(self::KEY);

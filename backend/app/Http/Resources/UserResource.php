@@ -5,9 +5,10 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\User */
+// Shapes a user into the JSON the app expects.
 class UserResource extends JsonResource
 {
+    // Builds the user array with a link to their photo.
     public function toArray(Request $request): array
     {
         return [

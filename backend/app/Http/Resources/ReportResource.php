@@ -7,19 +7,10 @@ use App\Support\ImageStore;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/**
- * How a report looks in JSON (see API-CONTRACT.md).
- *
- * The report is always loaded with `Report::withApiRelations()` (or ->loadApiRelations()), so printing a list does
- * not run a database query per row.
- *
- * What only admins get: `reporter` (name, phone, email, selfie link...), `reference`, and the link to the photo
- * of a guest report that is still waiting for review. Everybody else gets none of these.
- *
- * @mixin \App\Models\Report
- */
+// Shapes a report into the JSON the app expects.
 class ReportResource extends JsonResource
 {
+    // Builds the report array, hiding private bits from non-admins.
     public function toArray(Request $request): array
     {
         $isAdmin = (bool) $request->user('sanctum')?->isAdmin();
@@ -46,7 +37,7 @@ class ReportResource extends JsonResource
             ] : null),
             'source' => $this->source->value,
             'task' => $this->whenLoaded('task', fn () => $this->task ? new TaskResource($this->task) : null),
-            // Admin only
+
             'reference' => $this->when($isAdmin && $this->reference, fn () => $this->reference),
             'reporter' => $this->when(
                 $isAdmin && $this->isGuest() && $this->relationLoaded('guestReporter') && $this->guestReporter,
@@ -55,6 +46,7 @@ class ReportResource extends JsonResource
         ];
     }
 
+    // Finds the right picture link, or none for private photos a non-admin asks for.
     private function imageUrl(bool $isAdmin): ?string
     {
         if (! $this->image_path) {
@@ -62,7 +54,7 @@ class ReportResource extends JsonResource
         }
 
         if ($this->image_disk === 'private') {
-            // Not approved yet: nobody but an admin may even know the picture exists.
+
             return $isAdmin ? PrivateUrl::for($this->id, 'photo') : null;
         }
 

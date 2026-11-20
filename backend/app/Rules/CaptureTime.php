@@ -7,18 +7,13 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Throwable;
 
-/**
- * "When was this picture taken?" must be close to the SERVER's clock.
- *
- * A browser can claim anything, but a picture "taken" three days ago (a gallery upload) or tomorrow is a red flag.
- *   - method "live"       : taken inside the page, at most config('actify.guest.live_window_minutes') ago
- *   - method "camera-app" : phone fallback, the file must be at most config('actify.guest.camera_app_window_minutes') old
- * A little clock difference between the phone and the server is allowed (future_skew_minutes).
- */
+// Checks that a photo's timestamp is recent and not in the future.
 class CaptureTime implements ValidationRule
 {
+    // Remembers how the photo was taken and what "now" is.
     public function __construct(private readonly ?string $method = 'live', private readonly ?Carbon $now = null) {}
 
+    // Fails when the time is not a real date or is outside the allowed window.
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         try {

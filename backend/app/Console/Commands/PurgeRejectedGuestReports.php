@@ -8,16 +8,14 @@ use App\Support\ImageStore;
 use Illuminate\Console\Command;
 use RuntimeException;
 
-/**
- * A guest report an admin rejected keeps its personal details and selfie only for a while (in case of a dispute),
- * then everything is deleted. Scheduled daily in routes/console.php.
- */
+// Deletes old rejected guest reports and their pictures.
 class PurgeRejectedGuestReports extends Command
 {
     protected $signature = 'actify:purge-rejected-guest-reports {--days= : keep them this many days (default: config actify.guest.rejected_retention_days)}';
 
     protected $description = 'Delete rejected guest reports (and their pictures) older than the retention period';
 
+    // Removes each rejected guest report that is older than the keep period.
     public function handle(ImageStore $images): int
     {
         $days = (int) ($this->option('days') ?? config('actify.guest.rejected_retention_days'));

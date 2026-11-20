@@ -6,10 +6,7 @@ use App\Enums\CaptureMethod;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * The personal details and proof (selfie) behind a report filed without an account.
- * Only admins ever receive this data (see ReportResource and ReporterResource).
- */
+// The contact details and selfie of a guest who filed a report.
 class GuestReporter extends Model
 {
     protected $fillable = [
@@ -18,6 +15,7 @@ class GuestReporter extends Model
         'photo_capture_method', 'selfie_capture_method', 'ip', 'consented_at',
     ];
 
+    // Tells Laravel which fields get special treatment.
     protected function casts(): array
     {
         return [
@@ -29,12 +27,14 @@ class GuestReporter extends Model
         ];
     }
 
+    // The report this guest filed.
     public function report(): BelongsTo
     {
         return $this->belongsTo(Report::class);
     }
 
-    /** "+63 912-345-6789" -> "9123456789": the last 10 digits, used to spot the same person sending twice. */
+
+    // Turns a phone number into a short key used to spot repeat guests.
     public static function phoneKey(string $phone): string
     {
         $digits = preg_replace('/\D+/', '', $phone) ?? '';

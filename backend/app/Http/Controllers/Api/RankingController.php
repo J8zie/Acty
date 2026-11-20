@@ -9,16 +9,11 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+// Ranks volunteers by finished tasks and ratings.
 class RankingController extends Controller
 {
-    /**
-     * GET /volunteers/rankings[?barangay=&limit=] -> [{ id, first_name, last_name, barangay, completed_count,
-     * average_rating, ratings_count }]
-     *
-     * Built from FINISHED tasks only. Most completed first; ties go to the better average, then to the one with more
-     * ratings. `barangay` in each row is where that volunteer has finished the most reports. `?barangay=` counts
-     * only work done in that barangay.
-     */
+
+    // Returns the top volunteers, optionally for one barangay.
     public function __invoke(Request $request): JsonResponse
     {
         $request->validate([
@@ -39,7 +34,7 @@ class RankingController extends Controller
         $ranked = $rows->groupBy('volunteer_id')->map(function ($tasks, $volunteerId) {
             $ratings = $tasks->pluck('rating')->filter()->values();
             $places = $tasks->pluck('barangay')->countBy()->all();
-            // the barangay with the most finished reports (alphabetical when tied)
+
             uksort($places, fn ($a, $b) => [$places[$b], $a] <=> [$places[$a], $b]);
 
             return [

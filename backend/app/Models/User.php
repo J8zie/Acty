@@ -10,12 +10,10 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Support\ImageStore;
 use Laravel\Sanctum\HasApiTokens;
 
-/**
- * A person with an account: a resident, a volunteer or an admin (see App\Enums\Role).
- */
+// A person who can sign in: resident, volunteer or admin.
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+
     use HasApiTokens, HasFactory;
 
     protected $fillable = [
@@ -24,46 +22,50 @@ class User extends Authenticatable
 
     protected $hidden = ['password'];
 
+    // Tells Laravel which fields get special treatment.
     protected function casts(): array
     {
         return [
-            // 'hashed' = assigning a plain password stores its bcrypt hash; assigning a hash leaves it alone.
+
             'password' => 'hashed',
             'role' => Role::class,
         ];
     }
 
+    // Checks if this user is an admin.
     public function isAdmin(): bool
     {
         return $this->role === Role::Admin;
     }
 
+    // Checks if this user is a volunteer.
     public function isVolunteer(): bool
     {
         return $this->role === Role::Volunteer;
     }
 
+    // Checks if this user is a resident.
     public function isResident(): bool
     {
         return $this->role === Role::Resident;
     }
 
-    /** Reports this person filed. */
+
+    // The reports this user filed.
     public function reports(): HasMany
     {
         return $this->hasMany(Report::class);
     }
 
-    /** Tasks this person took as a volunteer. */
+
+    // The tasks this volunteer took.
     public function tasks(): HasMany
     {
         return $this->hasMany(ReportTask::class, 'volunteer_id');
     }
 
-    /**
-     * The address of the profile picture, or null (the app then draws the initials).
-     * The ?v= part changes whenever the account is saved, so a browser never shows a stale picture.
-     */
+
+    // The web address of this user's profile photo.
     public function photoUrl(): ?string
     {
         if (! $this->photo_path) {

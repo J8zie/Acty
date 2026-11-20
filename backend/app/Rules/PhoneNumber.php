@@ -5,12 +5,10 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-/**
- * "0912 345 6789", "+63 912 345 6789", "(082) 221-1234": digits with an optional leading + (or an opening bracket), and spaces, dashes,
- * dots or brackets between them. 7 to 15 digits in all (the international limit is 15).
- */
+// Checks that a phone number looks real.
 class PhoneNumber implements ValidationRule
 {
+    // Fails when the text is not a plausible phone number.
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $text = is_string($value) ? trim($value) : '';

@@ -15,15 +15,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-/**
- * A problem somebody reported (a pothole, a flood, a broken light...).
- *
- * Life of a report:   open -> in_progress (a volunteer accepted it) -> resolved   (or cancelled by an admin)
- * Guest reports also have a review step: review_status pending -> approved (public) or rejected (hidden).
- */
+// A problem someone reported that volunteers can help with.
 class Report extends Model
 {
-    /** @use HasFactory<ReportFactory> */
+
     use HasFactory;
 
     protected $fillable = [
@@ -31,6 +26,7 @@ class Report extends Model
         'latitude', 'longitude', 'image_path', 'image_disk', 'source', 'review_status', 'reference',
     ];
 
+    // Tells Laravel which fields get special treatment.
     protected function casts(): array
     {
         return [
@@ -39,66 +35,76 @@ class Report extends Model
             'status' => ReportStatus::class,
             'source' => ReportSource::class,
             'review_status' => ReviewStatus::class,
-            // decimal columns come back as strings from the database; the map needs real numbers
+
             'latitude' => 'float',
             'longitude' => 'float',
             'reviewed_at' => 'datetime',
         ];
     }
 
+    // Clears the cached stats whenever a report is saved or deleted.
     protected static function booted(): void
     {
-        // The landing page numbers are cached for a few seconds; any change to a report makes them stale at once.
+
         static::saved(fn () => StatsCache::forget());
         static::deleted(fn () => StatsCache::forget());
     }
 
+    // The category this report belongs to.
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    /** The resident who filed it (null for guest reports and for deleted accounts). */
+
+    // The account that filed this report, if any.
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    // The admin who reviewed this guest report.
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
-    /** The volunteer's job on this report. null until somebody accepts it. */
+
+    // The volunteer task attached to this report.
     public function task(): HasOne
     {
         return $this->hasOne(ReportTask::class);
     }
 
-    /** Who is behind a guest report (admins only). */
+
+    // The guest's contact details, if this came from a guest.
     public function guestReporter(): HasOne
     {
         return $this->hasOne(GuestReporter::class);
     }
 
+    // Checks if this report came from a guest without an account.
     public function isGuest(): bool
     {
         return $this->source === ReportSource::Guest;
     }
 
-    /** True when the public may see it: everything except guest reports still waiting for / failing review. */
+
+    // Checks if this report passed admin review and is public.
     public function isPublic(): bool
     {
         return $this->review_status === ReviewStatus::Approved;
     }
 
-    /** Only reports the public may see: ->approved(). Guest reports that are pending or rejected are left out. */
+
+    // Only shows reports an admin approved.
     public function scopeApproved(Builder $query): void
     {
         $query->where('review_status', ReviewStatus::Approved->value);
     }
 
-    /** Same as the scope below, for a report you already have in your hand. */
+
+    // Loads the relations the API answer needs onto this report.
     public function loadApiRelations(bool $withReporter = false): static
     {
         return $this->loadMissing([
@@ -109,7 +115,8 @@ class Report extends Model
         ]);
     }
 
-    /** Loads everything ReportResource prints, in a few queries instead of a few queries per report. */
+
+    // Eager-loads the relations the API answer needs in a list query.
     public function scopeWithApiRelations(Builder $query, bool $withReporter = false): void
     {
         $query->with([

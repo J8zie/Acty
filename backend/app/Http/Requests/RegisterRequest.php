@@ -8,22 +8,26 @@ use App\Rules\Patterns;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
+// Checks the details sent when someone signs up.
 class RegisterRequest extends FormRequest
 {
+    // Anyone may try to register.
     public function authorize(): bool
     {
         return true;
     }
 
+    // Tidies the username and email before they are checked.
     protected function prepareForValidation(): void
     {
-        // "Maria" and "maria" are one account; emails are compared in lowercase too.
+
         $this->merge([
             'username' => is_string($this->username) ? mb_strtolower(trim($this->username)) : $this->username,
             'email' => is_string($this->email) ? mb_strtolower(trim($this->email)) : $this->email,
         ]);
     }
 
+    // The rules every field must pass.
     public function rules(): array
     {
         return [
@@ -32,11 +36,12 @@ class RegisterRequest extends FormRequest
             'last_name' => ['required', 'string', 'min:2', 'max:60', 'regex:'.Patterns::NAME],
             'email' => ['required', 'string', 'email:rfc', 'max:255', 'unique:users,email'],
             'password' => Passwords::rules(),
-            // Only these two can be chosen at sign-up. An admin is made by another admin (or `php artisan actify:make-admin`).
+
             'role' => ['required', Rule::in([Role::Resident->value, Role::Volunteer->value])],
         ];
     }
 
+    // Friendlier wording for some of the error messages.
     public function messages(): array
     {
         return [

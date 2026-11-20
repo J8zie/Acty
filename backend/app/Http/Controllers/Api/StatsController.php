@@ -8,13 +8,11 @@ use App\Support\StatsCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 
+// Sends back the headline report numbers for the home page.
 class StatsController extends Controller
 {
-    /**
-     * GET /stats -> { total, open, in_progress, resolved } for the landing page.
-     * Counts only reports the public can see. Cancelled ones are in `total` only. Cached a few seconds; any change
-     * to a report clears the cache at once (Report::booted()).
-     */
+
+    // Counts approved reports by status, cached for a while.
     public function __invoke(): JsonResponse
     {
         $stats = Cache::remember(StatsCache::KEY, (int) config('actify.stats_cache_seconds'), function () {

@@ -6,9 +6,10 @@ use App\Support\ImageStore;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\ReportTask */
+// Shapes a volunteer task into the JSON the app expects.
 class TaskResource extends JsonResource
 {
+    // Builds the task array with volunteer and outcome details.
     public function toArray(Request $request): array
     {
         return [

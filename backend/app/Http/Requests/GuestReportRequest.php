@@ -11,33 +11,30 @@ use App\Rules\PhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/**
- * POST /reports/guest: a report filed WITHOUT an account.
- *
- * Because nobody is signed in, this form is the most guarded one: who they are, two pictures (the problem and a
- * selfie) that must have been taken just now, and an explicit consent. `consent` is this form's "are you sure".
- */
+// Checks everything a guest sends with a report, including the photos.
 class GuestReportRequest extends FormRequest
 {
+    // Anyone may send a guest report.
     public function authorize(): bool
     {
         return true;
     }
 
+    // The rules every guest report field must pass.
     public function rules(): array
     {
         $image = ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:'.config('actify.images.max_kb')];
         $methods = Rule::in(CaptureMethod::values());
 
         return [
-            // who
+
             'first_name' => ['required', 'string', 'min:2', 'max:60', 'regex:'.Patterns::NAME],
             'last_name' => ['required', 'string', 'min:2', 'max:60', 'regex:'.Patterns::NAME],
             'phone' => ['required', 'string', 'max:30', new PhoneNumber],
             'email' => ['nullable', 'string', 'email:rfc', 'max:255'],
             'reporter_barangay' => ['required', 'string', 'max:80'],
 
-            // what and where (same as a normal report)
+
             'title' => ['required', 'string', 'min:5', 'max:120'],
             'description' => ['required', 'string', 'min:15', 'max:2000'],
             'category_id' => ['required', 'integer', 'exists:categories,id'],
@@ -47,7 +44,7 @@ class GuestReportRequest extends FormRequest
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
 
-            // proof
+
             'photo' => $image,
             'photo_capture_method' => ['required', $methods],
             'photo_captured_at' => ['required', new CaptureTime($this->input('photo_capture_method'))],
@@ -60,6 +57,7 @@ class GuestReportRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for some of the error messages.
     public function messages(): array
     {
         return [

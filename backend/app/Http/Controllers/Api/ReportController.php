@@ -21,12 +21,11 @@ use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use Throwable;
 
+// Lists, shows, creates, edits and deletes reports.
 class ReportController extends Controller
 {
-    /**
-     * GET /reports : the list. Open to everybody; a token (when sent) adds `scope=mine|tasks` and, for admins,
-     * `review=pending` and the guest's details. All the filters are explained in ListReportsRequest.
-     */
+
+    // Lists reports with filters, search and paging.
     public function index(ListReportsRequest $request): JsonResponse
     {
         $viewer = $request->user('sanctum');
@@ -49,7 +48,8 @@ class ReportController extends Controller
             ->withHeaders($this->pagingHeaders($total, $page, $limit));
     }
 
-    /** GET /reports/{id}. A guest report that is not approved is a 404 for everybody except admins. */
+
+    // Shows one report if the person may see it.
     public function show(Request $request, Report $report): ReportResource
     {
         $viewer = $request->user('sanctum');
@@ -61,7 +61,8 @@ class ReportController extends Controller
         return new ReportResource($report->loadApiRelations(withReporter: (bool) $viewer?->isAdmin()));
     }
 
-    /** POST /reports (resident). Always created `open`, approved, and owned by the person who sent it. */
+
+    // Creates a report from a signed-in resident.
     public function store(StoreReportRequest $request, ImageStore $images): JsonResponse
     {
         $data = $request->validated();
@@ -92,13 +93,8 @@ class ReportController extends Controller
         return (new ReportResource($report->loadApiRelations()))->response()->setStatusCode(201);
     }
 
-    /**
-     * PATCH /reports/{id} { status, confirm? } (admin).
-     *   - Cancelling needs `confirm`.
-     *   - A guest report that is still waiting for review cannot change status: approve or reject it first.
-     *   - Back to `open` frees the volunteer's unfinished task (the request is available again); a FINISHED request
-     *     cannot be reopened (its outcome and rating would be lost).
-     */
+
+    // Changes a report's status (admin only).
     public function update(UpdateReportStatusRequest $request, Report $report): ReportResource
     {
         $status = ReportStatus::from($request->validated('status'));
@@ -126,7 +122,8 @@ class ReportController extends Controller
         return new ReportResource($report->loadApiRelations(withReporter: true));
     }
 
-    /** DELETE /reports/{id} { confirm } (admin) -> 204. The task, the guest details and every picture go with it. */
+
+    // Deletes a report and all its pictures.
     public function destroy(ConfirmRequest $request, Report $report, ImageStore $images): Response
     {
         $report->loadMissing(['task', 'guestReporter']);

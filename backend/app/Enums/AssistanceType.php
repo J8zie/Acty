@@ -2,6 +2,7 @@
 
 namespace App\Enums;
 
+// The kinds of help a report can ask for.
 enum AssistanceType: string
 {
     case Cleanup = 'cleanup';
@@ -11,7 +12,7 @@ enum AssistanceType: string
     case Awareness = 'awareness';
     case Other = 'other';
 
-    /** All the stored values, e.g. ['open', 'in_progress', ...]: used by validation rules and filters. */
+    // Gets all the stored values as a list.
     public static function values(): array
     {
         return array_column(self::cases(), 'value');

@@ -4,10 +4,11 @@ namespace App\Rules;
 
 use Illuminate\Validation\Rules\Password;
 
-/** One definition of "a good enough password" for sign-up and for changing it. */
+// The password rules every account must follow.
 final class Passwords
 {
-    /** At least 8 characters with a letter and a number; 72 is the most bcrypt can use. */
+
+    // Returns the list of password rules.
     public static function rules(): array
     {
         return ['required', 'string', 'max:72', Password::min(8)->letters()->numbers()];

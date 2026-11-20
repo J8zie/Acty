@@ -5,21 +5,24 @@ namespace App\Http\Requests;
 use App\Http\Requests\Concerns\RequiresConfirmation;
 use Illuminate\Foundation\Http\FormRequest;
 
-/** A request whose only input is the confirmation: DELETE /reports/{id}, DELETE /admin/users/{id}. */
+// Makes the person tick a confirm box before a dangerous action.
 class ConfirmRequest extends FormRequest
 {
     use RequiresConfirmation;
 
+    // Anyone signed in may send this; the route checks the role.
     public function authorize(): bool
     {
-        return true; // who may do it is decided by the route's role middleware and the policy
+        return true;
     }
 
+    // Only asks for the confirm tick.
     public function rules(): array
     {
         return $this->confirmationRules();
     }
 
+    // The confirm error messages.
     public function messages(): array
     {
         return $this->confirmationMessages();

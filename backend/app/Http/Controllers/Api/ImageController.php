@@ -7,14 +7,10 @@ use App\Models\Report;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/**
- * GET /reports/{id}/private/{photo|selfie}: serves a private picture.
- *
- * The route has the `signed:relative` middleware: the address must carry a valid signature that has not expired
- * (15 minutes), and only admins are ever given such an address. Without it: 403.
- */
+// Sends private report pictures to people who have a signed link.
 class ImageController extends Controller
 {
+    // Returns a private photo or selfie for a report.
     public function private(Report $report, string $kind): StreamedResponse
     {
         $path = match ($kind) {

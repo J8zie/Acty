@@ -6,17 +6,19 @@ use App\Http\Requests\Concerns\RequiresConfirmation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-/** POST /reports/{id}/complete (the volunteer who took the task says it is finished). */
+// Checks what a volunteer sends when finishing a task.
 class CompleteTaskRequest extends FormRequest
 {
     use RequiresConfirmation;
 
+    // Only the volunteer working on the report may finish it.
     public function authorize()
     {
-        // Only the volunteer who holds this report's task. Checked BEFORE the fields, so a stranger learns nothing.
+
         return Gate::inspect('work', $this->route('report'));
     }
 
+    // The rules the finish form must pass.
     public function rules(): array
     {
         return [
@@ -26,6 +28,7 @@ class CompleteTaskRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for some of the error messages.
     public function messages(): array
     {
         return [

@@ -15,12 +15,14 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
 
+// Handles sign up, sign in and sign out.
 class AuthController extends Controller
 {
-    /** A real bcrypt hash of a random word. Checked when the username does not exist, so "no such user" takes as long as "wrong password". */
+
     private const DUMMY_HASH = '$2y$12$5hSj.gnoIP1bO1tssPFR5.tHP7uL5nvv8faXZ11Cj4SI6MiBXNHOy';
 
-    /** POST /auth/register -> 201 { token, user } */
+
+    // Creates a new account and signs it in.
     public function register(RegisterRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -40,7 +42,8 @@ class AuthController extends Controller
         ], 201);
     }
 
-    /** POST /auth/login -> 200 { token, user }. Wrong details: 422 with a message (the sign-in page shows it). */
+
+    // Checks the username and password and signs the person in.
     public function login(LoginRequest $request): JsonResponse
     {
         $login = Str::lower(trim($request->string('username')->toString()));
@@ -50,7 +53,7 @@ class AuthController extends Controller
             ->orWhere('email', $login)
             ->first();
 
-        // Same message for "no such user" and "wrong password": never tell a stranger which usernames exist.
+
         $ok = Hash::check($request->string('password')->toString(), $user?->password ?? self::DUMMY_HASH) && $user;
 
         if (! $ok) {
@@ -63,7 +66,8 @@ class AuthController extends Controller
         ]);
     }
 
-    /** POST /auth/logout -> 204. Only THIS device's token is deleted. */
+
+    // Throws away the current login token.
     public function logout(Request $request): Response
     {
         $token = $request->user()->currentAccessToken();
@@ -74,7 +78,8 @@ class AuthController extends Controller
         return response()->noContent();
     }
 
-    /** A new token for this sign-in. A person keeps at most 10 devices signed in; the oldest are dropped. */
+
+    // Makes a new login token and clears out old ones.
     private function issueToken(User $user): string
     {
         $old = $user->tokens()->latest('id')->skip(9)->take(1000)->pluck('id');

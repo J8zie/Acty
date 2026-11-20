@@ -6,16 +6,18 @@ use App\Http\Requests\Concerns\RequiresConfirmation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-/** POST /reports/{id}/review (admin approves or rejects a guest report). Both decisions are confirmed. */
+// Checks the approve-or-reject choice an admin sends for a guest report.
 class ReviewReportRequest extends FormRequest
 {
     use RequiresConfirmation;
 
+    // The route already limits this to admins.
     public function authorize(): bool
     {
-        return true; // `role:admin` on the route
+        return true;
     }
 
+    // The rules the review must pass.
     public function rules(): array
     {
         return [
@@ -24,6 +26,7 @@ class ReviewReportRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for the review errors.
     public function messages(): array
     {
         return [

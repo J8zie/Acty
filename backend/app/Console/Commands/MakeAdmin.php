@@ -6,16 +6,14 @@ use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Console\Command;
 
-/**
- * The first admin cannot be made through the website (nobody is an admin yet), so make one here:
- *     php artisan actify:make-admin maria
- */
+// Makes an existing account an admin from the command line.
 class MakeAdmin extends Command
 {
     protected $signature = 'actify:make-admin {username : the username of an account that already exists}';
 
     protected $description = 'Give an existing account the admin role';
 
+    // Finds the user and gives them the admin role.
     public function handle(): int
     {
         $user = User::query()->where('username', mb_strtolower($this->argument('username')))->first();

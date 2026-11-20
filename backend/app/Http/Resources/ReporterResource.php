@@ -6,13 +6,10 @@ use App\Support\PrivateUrl;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/**
- * The person behind a guest report. ReportResource only includes this for admins.
- *
- * @mixin \App\Models\GuestReporter
- */
+// Shapes a guest reporter's details for admins.
 class ReporterResource extends JsonResource
 {
+    // Builds the reporter array with a signed link to the selfie.
     public function toArray(Request $request): array
     {
         return [
@@ -21,7 +18,7 @@ class ReporterResource extends JsonResource
             'phone' => $this->phone,
             'email' => $this->email,
             'barangay' => $this->barangay,
-            // never a plain /storage address: a signed link that stops working after a few minutes
+
             'selfie_url' => PrivateUrl::for($this->report_id, 'selfie'),
             'liveness_prompt' => $this->liveness_prompt,
             'photo_captured_at' => $this->photo_captured_at?->toISOString(),

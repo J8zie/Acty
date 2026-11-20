@@ -4,13 +4,16 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
+// Checks the picture file sent when changing a profile photo.
 class UpdatePhotoRequest extends FormRequest
 {
+    // The signed-in person may upload their own photo.
     public function authorize(): bool
     {
         return true;
     }
 
+    // The rules the photo file must pass.
     public function rules(): array
     {
         return [
@@ -18,6 +21,7 @@ class UpdatePhotoRequest extends FormRequest
         ];
     }
 
+    // Friendlier wording for the photo errors.
     public function messages(): array
     {
         return [
