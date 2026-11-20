@@ -6,7 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+
+    // Creates the table.
+
+    public function public function up(): void
     {
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
@@ -42,7 +45,10 @@ return new class extends Migration
         });
     }
 
-    public function down(): void
+
+    // Drops the table.
+
+    public function public function down(): void
     {
         Schema::dropIfExists('failed_jobs');
         Schema::dropIfExists('job_batches');

@@ -5,7 +5,10 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
-    public function up(): void
+
+    // Creates the table.
+
+    public function public function up(): void
     {
         if (DB::connection()->getDriverName() !== 'pgsql') {
             return;
@@ -16,7 +19,10 @@ return new class extends Migration
         }
     }
 
-    public function down(): void
+
+    // Drops the table.
+
+    public function public function down(): void
     {
         if (DB::connection()->getDriverName() !== 'pgsql') {
             return;
@@ -27,7 +33,7 @@ return new class extends Migration
         }
     }
 
-    /** @return array<object{schemaname: string, tablename: string}> */
+
     private function tablesInCurrentSchema(): array
     {
         return DB::select(
