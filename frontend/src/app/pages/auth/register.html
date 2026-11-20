@@ -1,0 +1,52 @@
+
+<app-page-head eyebrow="Account" meta="Join Actify" title="Join your neighbours." lead="Residents report problems. Volunteers solve them. Pick the role that fits you." />
+
+<section class="container-x">
+  
+  <form class="grid max-w-3xl gap-8" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    
+    <div>
+      <p class="label mb-3 opacity-60">I want to</p>
+      <div class="flex flex-wrap gap-2" role="group" aria-label="Role">
+        <button type="button" class="chip" [attr.aria-pressed]="form.controls.role.value === 'resident'" (click)="form.controls.role.setValue('resident')">Report problems</button>
+        <button type="button" class="chip" [attr.aria-pressed]="form.controls.role.value === 'volunteer'" (click)="form.controls.role.setValue('volunteer')">Volunteer</button>
+      </div>
+    </div>
+
+    
+    <div class="grid gap-8 md:grid-cols-2">
+      <label class="field"><span class="label">First name</span>
+        <input class="input" formControlName="firstName" autocomplete="given-name" maxlength="60" data-testid="first-name" [attr.aria-invalid]="bad('firstName')" />
+        <app-field-error [control]="form.controls.firstName" label="First name" [server]="server().firstName ?? ''" /></label>
+      <label class="field"><span class="label">Last name</span>
+        <input class="input" formControlName="lastName" autocomplete="family-name" maxlength="60" data-testid="last-name" [attr.aria-invalid]="bad('lastName')" />
+        <app-field-error [control]="form.controls.lastName" label="Last name" [server]="server().lastName ?? ''" /></label>
+      <label class="field"><span class="label">Username</span>
+        <input class="input" formControlName="username" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="30" data-testid="username" [attr.aria-invalid]="bad('username')" />
+        <span class="label opacity-60">3 to 30 letters, numbers or underscores.</span>
+        <app-field-error [control]="form.controls.username" label="Username" [server]="server().username ?? ''" /></label>
+      <label class="field"><span class="label">Email</span>
+        <input class="input" type="email" inputmode="email" formControlName="email" autocomplete="email" autocapitalize="none" maxlength="255" data-testid="email" [attr.aria-invalid]="bad('email')" />
+        <app-field-error [control]="form.controls.email" label="Email" [server]="server().email ?? ''" /></label>
+      <div class="field md:col-span-2">
+        <label class="grid gap-2"><span class="label">Password</span>
+          <span class="flex items-end gap-3">
+            <input class="input flex-1" [type]="showPassword() ? 'text' : 'password'" formControlName="password" autocomplete="new-password" maxlength="72" data-testid="password" [attr.aria-invalid]="bad('password')" />
+            <button type="button" class="chip" data-testid="toggle-password" [attr.aria-pressed]="showPassword()" (click)="showPassword.set(!showPassword())">{{ showPassword() ? 'Hide' : 'Show' }}</button>
+          </span></label>
+        <app-password-hints [value]="form.controls.password.value" />
+        <app-field-error [control]="form.controls.password" label="Password" [server]="server().password ?? ''" />
+      </div>
+    </div>
+
+    
+    @if (error()) {
+      <p class="error-text" role="alert">{{ error() }}</p>
+    }
+    <div class="flex flex-wrap items-center gap-6">
+      
+      <button type="submit" class="btn btn-solid" appMagnetic [disabled]="busy()">{{ busy() ? 'Creating account…' : 'Create account' }}</button>
+      <a appLink="/login" class="label u-link">Already a member? Log in</a>
+    </div>
+  </form>
+</section>

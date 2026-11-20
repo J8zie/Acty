@@ -1,0 +1,25 @@
+
+
+@if (state() === 'loading') {
+  
+  <div class="container-x" role="status" aria-live="polite" aria-busy="true">
+    <span class="sr-only">Loading…</span>
+    
+    @for (i of rowList(); track i) {
+      <div class="hairline-t grid-12 items-center gap-y-3 py-6" aria-hidden="true">
+        <div class="skeleton col-span-2 h-3 md:col-span-1"></div>
+        <div class="skeleton col-span-10 h-7 md:col-span-5" [style.opacity]="1 - i * 0.14"></div>
+        <div class="skeleton col-span-6 h-3 md:col-span-3"></div>
+        <div class="skeleton col-span-4 h-3 md:col-span-2"></div>
+      </div>
+    }
+    <div class="hairline-t"></div>
+  </div>
+} @else if (state() === 'error') {
+  
+  <div class="container-x hairline-t py-14" role="alert">
+    <p class="text-title max-w-[28ch]">{{ error() || 'Something went wrong.' }}</p>
+    
+    <button type="button" class="btn mt-6" (click)="retry.emit()">Try again</button>
+  </div>
+}

@@ -1,0 +1,82 @@
+
+
+@if (visible()) {
+  
+  <div #panel class="curve fixed inset-0 z-[100] bg-brand-background" role="status" aria-label="Loading Actify">
+    
+    <div
+      #content
+      class="container-x absolute inset-0 flex flex-col justify-between pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+    >
+      
+      <div class="label flex justify-between">
+        <span>Actify</span>
+        <span class="hidden sm:block">Community reports, volunteer action</span>
+        <span>Tagum City, PH</span>
+      </div>
+
+      
+      <div class="flex flex-col items-center gap-5 md:gap-8">
+        
+        <svg
+          #scene
+          viewBox="60 100 520 180"
+          class="w-[min(125vw,1000px)] max-w-none overflow-visible text-brand-text sm:w-[min(94vw,980px)]"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+          focusable="false"
+        >
+          
+          <line class="ground" x1="70" y1="250" x2="570" y2="250" />
+          <g class="house"><path d="M76 250V212L105 188L134 212V250" /><rect class="win" x="97" y="222" width="16" height="16" style="fill:var(--color-brand-accent);stroke:none" /></g>
+          <g class="house"><path d="M142 250V224L163 206L184 224V250" /><rect class="win" x="156" y="232" width="14" height="12" style="fill:var(--color-brand-accent);stroke:none" /></g>
+          <g class="house"><path d="M456 250V224L477 206L498 224V250" /><rect class="win" x="470" y="232" width="14" height="12" style="fill:var(--color-brand-accent);stroke:none" /></g>
+          <g class="house"><path d="M506 250V212L535 188L564 212V250" /><rect class="win" x="527" y="222" width="16" height="16" style="fill:var(--color-brand-accent);stroke:none" /></g>
+
+          
+          <ellipse class="halo" cx="320" cy="252" rx="40" ry="8" style="stroke:var(--color-brand-accent)" />
+          <ellipse class="ring" cx="320" cy="252" rx="118" ry="16" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" stroke-width="3" />
+
+          
+          <g class="person" data-dir="-1" data-o="1" style="fill:currentColor;stroke:none"><circle cx="225" cy="216" r="9" /><path d="M215 250V234a10 10 0 0 1 20 0V250z" /></g>
+          <g class="person" data-dir="-1" data-o="0.6" style="fill:currentColor;stroke:none"><circle cx="265" cy="216" r="9" /><path d="M255 250V234a10 10 0 0 1 20 0V250z" /></g>
+          <g class="person" data-dir="1" data-o="0.6" style="fill:currentColor;stroke:none"><circle cx="375" cy="216" r="9" /><path d="M365 250V234a10 10 0 0 1 20 0V250z" /></g>
+          <g class="person" data-dir="1" data-o="1" style="fill:currentColor;stroke:none"><circle cx="415" cy="216" r="9" /><path d="M405 250V234a10 10 0 0 1 20 0V250z" /></g>
+
+          
+          <g class="pin-open" style="fill:var(--color-brand-accent);stroke:none">
+            <path d="M320 250C300 222 288 206 288 188a32 32 0 1 1 64 0C352 206 340 222 320 250z" />
+            <circle cx="320" cy="188" r="11" style="fill:var(--color-brand-background)" />
+          </g>
+          <g class="pin-done" style="fill:currentColor;stroke:none;opacity:0">
+            <path d="M320 250C300 222 288 206 288 188a32 32 0 1 1 64 0C352 206 340 222 320 250z" />
+          </g>
+          <path class="check" d="M306 189L316 199L336 177" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" stroke-width="6.5" style="stroke:var(--color-brand-background)" />
+          
+          @for (s of sparks; track $index) {
+            <circle class="spark" cx="320" cy="188" [attr.r]="s.r" style="stroke:none;opacity:0" [style.fill]="s.accent ? 'var(--color-brand-accent)' : 'currentColor'" [attr.data-a]="s.a" [attr.data-d]="s.d" />
+          }
+        </svg>
+
+        
+        <div #caps class="font-display relative h-[1.35em] w-full overflow-y-clip text-center text-[clamp(1.05rem,2.6vw,2rem)] leading-[1.35]" aria-hidden="true">
+          <p class="absolute inset-x-0">Spot it.</p>
+          <p class="absolute inset-x-0">Neighbours show up.</p>
+          <p class="absolute inset-x-0">Fixed together.</p>
+        </div>
+      </div>
+
+      
+      <div class="flex items-end gap-4">
+        <div class="h-[2px] flex-1 bg-brand-text/20">
+          <div #bar class="h-[2px] origin-left scale-x-0 bg-brand-accent"></div>
+        </div>
+        <span class="label shrink-0">Loading</span>
+      </div>
+    </div>
+  </div>
+}

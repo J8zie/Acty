@@ -1,0 +1,45 @@
+
+<footer class="container-x mt-32 pt-16 pb-5 hairline-t">
+  <div class="grid-12 gap-y-12">
+    <p class="text-title col-span-12 max-w-[24ch] md:col-span-6">
+      See it. Report it. Neighbours show up.
+    </p>
+    
+    <nav class="col-span-6 grid content-start gap-3 md:col-span-3" aria-label="Explore">
+      <span class="label opacity-60">Explore</span>
+      <a appLink="/#about" class="label u-link w-fit">About</a>
+      <a appLink="/#how" class="label u-link w-fit">How it works</a>
+      <a appLink="/reports" class="label u-link w-fit">Reports</a>
+      
+      @if (reportLink(); as r) {
+        <a [appLink]="r" class="label u-link w-fit">Report a problem</a>
+      }
+      <a appLink="/rankings" class="label u-link w-fit">Volunteers</a>
+    </nav>
+    
+    <nav class="col-span-6 grid content-start gap-3 md:col-span-3" aria-label="Account">
+      <span class="label opacity-60">Account</span>
+      @if (auth.user()) {
+        <a [appLink]="auth.homeFor(auth.role())" class="label u-link w-fit">My space</a>
+      } @else {
+        <a appLink="/login" class="label u-link w-fit">Log in</a>
+        <a appLink="/register" class="label u-link w-fit">Create account</a>
+      }
+    </nav>
+  </div>
+
+  
+  <p
+    class="font-display mt-20 mb-6 overflow-hidden pb-[0.06em] text-[clamp(3rem,17.5vw,24rem)] leading-[0.9] tracking-[-0.01em] select-none"
+    aria-hidden="true"
+  >
+    Actify
+  </p>
+
+  
+  <div class="label mt-8 flex flex-wrap items-center justify-between gap-4 opacity-70">
+    <span>© 2026 Actify · Tagum City, Davao del Norte</span>
+    <span>Non-emergency reports only. In an emergency, call 911.</span>
+    <button type="button" appMagnetic class="u-link" (click)="top()">Back to top ↑</button>
+  </div>
+</footer>

@@ -1,0 +1,94 @@
+
+
+<app-page-head
+  eyebrow="Volunteer"
+  [meta]="list.state() === 'ready' ? active().length + ' active · ' + done().length + ' complete' : ''"
+  title="Your tasks."
+  lead="Start the work, then post proof when it is done. The resident can then rate your help."
+>
+  <a appLink="/volunteer/nearby" appMagnetic class="btn btn-solid">Find more requests</a>
+</app-page-head>
+
+<app-load-state [state]="list.state()" [error]="list.error()" (retry)="list.reload()" />
+
+@if (list.state() === 'ready') {
+  
+  <section class="container-x">
+    <h2 class="text-title mb-6">In progress</h2>
+    <ul class="hairline-t">
+      @for (r of active(); track r.id; let i = $index) {
+        <li class="hairline-b py-8" [appFadeUp]="i">
+          <div class="grid-12 items-start gap-y-4">
+            <a class="text-title col-span-12 md:col-span-6" [appLink]="'/reports/' + r.id" linkLabel="Report">{{ r.title }}</a>
+            <p class="label col-span-6 opacity-60 md:col-span-3">{{ r.barangay }}</p>
+            <p class="col-span-6 md:col-span-3 md:text-right"><app-status [status]="r.taskStatus ?? 'accepted'" /></p>
+
+            
+            <ol class="col-span-12 mt-2 grid grid-cols-3 gap-2" aria-label="Progress">
+              @for (s of steps; track s.key) {
+                <li>
+                  <span class="block h-[2px] bg-brand-accent transition-opacity duration-700" [class.opacity-20]="!reached(r, s.key)"></span>
+                  <span class="label mt-2 block" [class.opacity-40]="!reached(r, s.key)">{{ s.label }}</span>
+                </li>
+              }
+            </ol>
+
+            
+            <div class="col-span-12 mt-2 flex flex-wrap gap-3">
+              @if (r.taskStatus === 'accepted') {
+                <button type="button" class="btn" [disabled]="pending() === r.id" (click)="start(r)">
+                  {{ pending() === r.id ? 'Starting…' : 'Start work' }}
+                </button>
+              }
+              @if (completing() !== r.id) {
+                <button type="button" class="btn btn-solid" (click)="openForm(r.id)">Mark complete</button>
+              }
+            </div>
+
+            
+            @if (completing() === r.id) {
+              <div class="col-span-12 mt-4 grid gap-6 border border-brand-text/30 p-5 md:grid-cols-2">
+                <label class="field"><span class="label">What did you do?</span>
+                  <textarea class="input" rows="3" maxlength="1000" data-testid="complete-note" placeholder="Cleared the drain and bagged the waste." [value]="note()" (input)="note.set($any($event.target).value)"></textarea>
+                  <span class="label opacity-60">{{ note().length }} / 1000</span></label>
+                <app-file-drop title="Add a photo of the result" (chosen)="photo.set($event)" />
+                <div class="flex flex-wrap gap-3 md:col-span-2">
+                  <button type="button" class="btn btn-solid" [disabled]="pending() === r.id" (click)="finish(r)">
+                    {{ pending() === r.id ? 'Sending…' : 'Confirm complete' }}
+                  </button>
+                  <button type="button" class="btn" (click)="completing.set(null)">Cancel</button>
+                </div>
+              </div>
+            }
+            
+            @if (problem() && problemFor() === r.id) {
+              <p class="error-text col-span-12" role="alert">{{ problem() }}</p>
+            }
+          </div>
+        </li>
+      } @empty {
+        
+        <li class="py-12">
+          <p class="text-title">No active tasks.</p>
+          <a appLink="/volunteer/nearby" class="label u-link mt-3 inline-block">Find a request near you →</a>
+        </li>
+      }
+    </ul>
+  </section>
+
+  
+  <section class="container-x mt-20">
+    <h2 class="text-title mb-6">Completed</h2>
+    <ul class="hairline-t">
+      @for (r of done(); track r.id; let i = $index) {
+        <li class="hairline-b grid-12 items-baseline gap-y-2 py-6" [appFadeUp]="i">
+          <a class="text-title col-span-12 md:col-span-6" [appLink]="'/reports/' + r.id" linkLabel="Report">{{ r.title }}</a>
+          <p class="label col-span-6 opacity-60 md:col-span-3">{{ r.completedAt }}</p>
+          <p class="col-span-6 text-right text-xl tracking-widest md:col-span-3">{{ r.rating ? '★'.repeat(r.rating) + '☆'.repeat(5 - r.rating) : 'Awaiting rating' }}</p>
+        </li>
+      } @empty {
+        <li class="py-8 opacity-70">Finished tasks show up here.</li>
+      }
+    </ul>
+  </section>
+}

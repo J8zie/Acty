@@ -1,0 +1,5 @@
+
+<span class="label inline-flex items-center gap-2 whitespace-nowrap">
+  <span class="dot" [class.dot-open]="shape() === 'hollow'" [class.dot-half]="shape() === 'half'" [class.dot-solid]="shape() === 'solid'" [class.dot-cross]="shape() === 'cross'"></span>
+  {{ text() }}
+</span>

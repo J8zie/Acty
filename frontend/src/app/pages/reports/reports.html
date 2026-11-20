@@ -1,0 +1,75 @@
+
+
+<app-page-head
+  eyebrow="Reports"
+  [meta]="list.state() === 'ready' ? list.total() + (list.active() ? ' found' : ' reported in Tagum') : ''"
+  title="Everything neighbours have reported."
+  lead="Search by words or a report number, narrow by status, category, urgency or barangay. Hover a row to peek at the photo, or switch to the map."
+>
+  
+  @if (fileLink(); as f) {
+    <a [appLink]="f.to" appMagnetic class="btn btn-solid" data-testid="file-report">{{ f.label }}</a>
+  }
+</app-page-head>
+
+<section class="container-x mb-8 grid gap-6" aria-label="Search and filters" data-testid="filters">
+  <div class="flex flex-wrap items-end gap-x-6 gap-y-5">
+    <app-search-box
+      class="grow md:max-w-md"
+      label="Search"
+      placeholder="Title, place, category or #number"
+      testId="reports-search"
+      [value]="list.filters().q"
+      (valueChange)="list.setFilter('q', $event)"
+    />
+    <app-filter-select label="Category" allLabel="All categories" testId="filter-category" [options]="categoryOptions()" [value]="list.filters().category" (valueChange)="list.setFilter('category', $event)" />
+    <app-filter-select label="Urgency" allLabel="Any urgency" testId="filter-urgency" [options]="urgencyOptions" [value]="list.filters().urgency" (valueChange)="list.setFilter('urgency', $event)" />
+    <app-filter-select label="Barangay" allLabel="All barangays" testId="filter-barangay" [options]="barangayOptions" [value]="list.filters().barangay" (valueChange)="list.setFilter('barangay', $event)" />
+    <app-filter-select label="Sort" testId="filter-sort" [withAll]="false" [options]="sortOptions" [value]="list.filters().sort || 'newest'" (valueChange)="list.setFilter('sort', $event === 'newest' ? '' : $event)" />
+  </div>
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Filter by status">
+      @for (s of statuses; track s.value) {
+        <button type="button" class="chip" [attr.data-testid]="'status-' + (s.value || 'all')" [attr.aria-pressed]="list.filters().status === s.value" (click)="list.setFilter('status', s.value)">
+          {{ s.label }}
+        </button>
+      }
+    </div>
+    
+    <div class="flex gap-2" role="group" aria-label="View">
+      <button type="button" class="chip" data-testid="view-list" [attr.aria-pressed]="view() === 'list'" (click)="view.set('list')">List</button>
+      <button type="button" class="chip" data-testid="view-map" [attr.aria-pressed]="view() === 'map'" (click)="view.set('map')">Map</button>
+    </div>
+  </div>
+  @if (list.state() === 'ready') {
+    <app-result-bar [shown]="list.items().length" [total]="list.total()" noun="reports" [filtered]="list.active()" [busy]="list.busy()" (clear)="list.reset()" />
+  }
+</section>
+
+<app-load-state [state]="list.state()" [error]="list.error()" (retry)="list.reload()" />
+
+@if (list.state() === 'ready') {
+  @if (view() === 'list') {
+    
+    <app-report-list
+      [reports]="list.items()"
+      [emptyTitle]="list.active() ? 'Nothing matches that search.' : 'No reports yet.'"
+      [emptyText]="list.active() ? 'Try fewer words, or press “Clear filters”.' : 'Reports appear here once neighbours file them and an admin approves them.'"
+    />
+  } @else {
+    
+    <section class="container-x">
+      <app-map class="h-[72vh] min-h-[420px]" [reports]="list.items()" [fit]="true" (selected)="open($event)" />
+      <p class="label mt-3 opacity-60">{{ list.items().length }} pins · tap a pin, then “Open report”</p>
+    </section>
+  }
+  
+  @if (list.hasMore()) {
+    <div class="container-x mt-8 flex justify-center">
+      <button type="button" class="btn" data-testid="load-more" [disabled]="list.busy()" (click)="list.loadMore()">
+        {{ list.busy() ? 'Loading…' : 'Load more (' + remaining() + ' left)' }}
+      </button>
+    </div>
+  }
+}

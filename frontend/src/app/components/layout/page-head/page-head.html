@@ -1,0 +1,16 @@
+
+<section class="container-x pt-32 pb-10 md:pt-40">
+  
+  <p class="label flex justify-between opacity-70">
+    <span>{{ eyebrow() }}</span>
+    <span>{{ meta() }}</span>
+  </p>
+  <h1 class="text-headline mt-8 max-w-[20ch]" appReveal="load">{{ title() }}</h1>
+  <div class="grid-12 mt-8 items-end gap-y-6">
+    <p class="text-title col-span-12 max-w-[36ch] opacity-80 md:col-span-6">{{ lead() }}</p>
+    
+    <div class="col-span-12 flex flex-wrap items-center gap-3 md:col-span-6 md:justify-end">
+      <ng-content />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,84 @@
+
+
+<app-page-head
+  eyebrow="Volunteer"
+  [meta]="list.state() === 'ready' ? rows().length + ' open requests' : ''"
+  title="Requests near you."
+  lead="Open reports sorted by distance. Accept one and it moves to your tasks."
+>
+  <button type="button" class="btn" appMagnetic (click)="locate()">{{ located() ? 'Update my location' : 'Use my location' }}</button>
+</app-page-head>
+
+@if (geoError()) {
+  <p class="error-text container-x mb-4" role="alert">{{ geoError() }}</p>
+}
+@if (problem()) {
+  <p class="error-text container-x mb-4" role="alert">{{ problem() }}</p>
+}
+@if (justAccepted(); as j) {
+  <div class="container-x mb-6" role="status">
+    <div class="inverted flex flex-wrap items-center justify-between gap-4 px-5 py-4">
+      <p class="text-title">You accepted “{{ j.title }}”.</p>
+      <a appLink="/volunteer/tasks" class="label u-link">Go to my tasks →</a>
+    </div>
+  </div>
+}
+
+<app-load-state [state]="list.state()" [error]="list.error()" (retry)="list.reload()" />
+
+@if (list.state() === 'ready') {
+  
+  <section class="container-x mb-8 grid gap-5" aria-label="Search and filters" data-testid="filters">
+    <div class="flex flex-wrap items-end gap-x-6 gap-y-5">
+      <app-search-box class="grow md:max-w-md" label="Search" placeholder="Title, place or #number" testId="nearby-search" [value]="list.filters().q" (valueChange)="list.setFilter('q', $event)" />
+      <app-filter-select label="Category" allLabel="All categories" testId="filter-category" [options]="categoryOptions()" [value]="list.filters().category" (valueChange)="list.setFilter('category', $event)" />
+      <app-filter-select label="Urgency" allLabel="Any urgency" testId="filter-urgency" [options]="urgencyOptions" [value]="list.filters().urgency" (valueChange)="list.setFilter('urgency', $event)" />
+    </div>
+    <app-result-bar [shown]="rows().length" [total]="list.total()" noun="open requests" [filtered]="list.active() || radius() > 0" [busy]="list.busy()" (clear)="radius.set(0); list.reset()" />
+  </section>
+
+  
+  <section class="container-x">
+    <app-map class="h-[52vh] min-h-[340px]" [reports]="mapReports()" [me]="located() ? me() : null" [center]="me()" [fit]="true" (selected)="open($event)" />
+    <div class="mt-4 flex flex-wrap items-center gap-2" role="group" aria-label="Distance">
+      <span class="label mr-2 opacity-60">Within</span>
+      @for (r of radii; track r.km) {
+        <button type="button" class="chip" [attr.aria-pressed]="radius() === r.km" (click)="radius.set(r.km)">{{ r.label }}</button>
+      }
+    </div>
+  </section>
+
+  
+  <ul class="works hairline-t mt-10">
+    @for (row of rows(); track row.report.id; let i = $index) {
+      <li class="hairline-b" [appFadeUp]="i">
+        <div class="row container-x grid-12 items-center gap-y-3 py-5 md:py-6">
+          <span class="label col-span-3 opacity-60 md:col-span-1">{{ row.km.toFixed(1) }} km</span>
+          <a
+            class="text-title col-span-9 md:col-span-4"
+            [appLink]="'/reports/' + row.report.id"
+            linkLabel="Report"
+            [appPreview]="image(row.report)"
+            [previewLabel]="row.report.category"
+            [previewNumber]="pad(row.report.number)"
+            >{{ row.report.title }}</a
+          >
+          <span class="label col-span-6 opacity-60 md:col-span-2">{{ row.report.barangay }}</span>
+          <span class="label col-span-6 opacity-60 md:col-span-2">{{ urgency[row.report.urgency] }} · {{ assistance[row.report.assistanceType] }}</span>
+          
+          <span class="col-span-12 md:col-span-3 md:text-right">
+            <button type="button" class="btn btn-sm" [disabled]="accepting() === row.report.id" (click)="accept(row.report)">
+              {{ accepting() === row.report.id ? 'Accepting…' : 'Accept' }}
+            </button>
+          </span>
+        </div>
+      </li>
+    } @empty {
+      
+      <li class="container-x py-16">
+        <p class="text-title">{{ list.active() ? 'No open requests match that search.' : list.items().length ? 'No open requests in this range.' : 'No open requests right now.' }}</p>
+        <p class="label mt-3 opacity-60">{{ list.active() ? 'Try fewer words, or press “Clear filters”.' : list.items().length ? 'Try a wider distance.' : 'New reports show up here as residents file them.' }}</p>
+      </li>
+    }
+  </ul>
+}

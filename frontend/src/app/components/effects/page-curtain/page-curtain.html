@@ -1,0 +1,16 @@
+
+
+<div
+  #panel
+  class="curve pointer-events-none fixed inset-0 z-[90] flex items-center justify-center bg-brand-text text-brand-background"
+  style="visibility: hidden"
+  aria-hidden="true"
+>
+  
+  <span class="label absolute top-[max(1.25rem,env(safe-area-inset-top))] left-[clamp(1rem,3vw,3rem)]">Actify</span>
+  <span class="label absolute top-[max(1.25rem,env(safe-area-inset-top))] right-[clamp(1rem,3vw,3rem)]">Loading</span>
+  
+  <div class="overflow-y-clip px-4 pb-[0.14em]">
+    <p #label class="text-display">{{ transition.label() }}</p>
+  </div>
+</div>

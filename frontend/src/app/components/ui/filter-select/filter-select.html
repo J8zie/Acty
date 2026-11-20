@@ -1,0 +1,12 @@
+
+<label class="field">
+  <span class="label opacity-60">{{ label() }}</span>
+  <select class="input !w-auto !py-1 !pr-6" [attr.data-testid]="testId()" (change)="onChange($event)">
+    @if (withAll()) {
+      <option value="" [selected]="!value()">{{ allLabel() }}</option>
+    }
+    @for (o of options(); track o.value) {
+      <option [value]="o.value" [selected]="o.value === value()">{{ o.label }}</option>
+    }
+  </select>
+</label>

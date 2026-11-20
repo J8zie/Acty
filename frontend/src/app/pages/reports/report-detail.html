@@ -1,0 +1,152 @@
+
+
+@if (item.state() !== 'ready') {
+  
+  <section class="container-x pt-28 md:pt-36">
+    <a appLink="/reports" linkLabel="Reports" class="label u-link mb-10 inline-block">← All reports</a>
+  </section>
+  
+  <app-load-state [state]="item.state()" [error]="item.error()" [rows]="2" (retry)="item.reload()" />
+} @else {
+  
+  @let r = item.data();
+  
+  @for (x of [r]; track x.id) {
+    <section class="container-x pt-28 md:pt-36">
+      <a appLink="/reports" linkLabel="Reports" class="label u-link inline-block">← All reports</a>
+      
+      <p class="label mt-10 flex flex-wrap items-center justify-between gap-3 opacity-80">
+        <span>No. {{ pad(x.number) }} · {{ x.category }}</span>
+        <app-status [status]="x.status" />
+      </p>
+      <h1 class="text-headline mt-6 max-w-[22ch]" appReveal="load">{{ x.title }}</h1>
+    </section>
+  }
+
+  
+  <section class="container-x mt-12 grid-12 gap-y-12">
+    <div class="col-span-12 md:col-span-7">
+      
+      <div class="duotone aspect-[4/3] w-full" [class.no-image]="imgStage() >= 2" appImageReveal>
+        @if (imgStage() < 2) {
+          <img [src]="src()" [alt]="'Photo for ' + r.title" appParallax="8" (error)="imgStage.set(imgStage() + 1)" />
+        }
+      </div>
+      
+      <p class="text-title mt-10 max-w-[36ch]" appFadeUp>{{ r.description }}</p>
+    </div>
+
+    <aside class="col-span-12 md:col-span-4 md:col-start-9">
+      
+      <dl class="hairline-t">
+        @for (row of facts(); track row.k) {
+          <div class="hairline-b flex items-baseline justify-between gap-6 py-4">
+            <dt class="label opacity-60">{{ row.k }}</dt>
+            <dd class="text-right text-base tracking-tight">{{ row.v }}</dd>
+          </div>
+        }
+      </dl>
+
+      
+      <div class="mt-8 grid gap-3">
+        
+        @if (accepted()) {
+          <p class="text-title" role="status">You accepted this request.</p>
+          <a appLink="/volunteer/tasks" appMagnetic class="btn btn-solid">Go to my tasks</a>
+        } @else if (canAccept(r)) {
+          
+          <button type="button" appMagnetic class="btn btn-solid" [disabled]="busy()" (click)="accept(r)">
+            {{ busy() ? 'Accepting…' : 'Accept this request' }}
+          </button>
+        } @else if (r.status === 'open' && !auth.isLoggedIn()) {
+          
+          <a appLink="/login" appMagnetic class="btn btn-solid">Log in to volunteer</a>
+        }
+        
+        @if (problem()) {
+          <p class="error-text" role="alert">{{ problem() }}</p>
+        }
+      </div>
+
+      
+      @if (canRate(r)) {
+        <div class="mt-8">
+          <p class="label opacity-60">Rate {{ r.volunteerName }}'s work</p>
+          <div class="mt-3 flex gap-1" role="group" aria-label="Rating">
+            
+            @for (n of [1, 2, 3, 4, 5]; track n) {
+              <button
+                type="button"
+                class="-m-0.5 p-1 text-3xl transition-transform hover:-translate-y-1 active:scale-90"
+                [disabled]="busy()"
+                [attr.aria-label]="n + ' stars'"
+                (click)="rate(r, n)"
+              >☆</button>
+            }
+          </div>
+        </div>
+      }
+      
+      @if (ratingSoon(r)) {
+        <p class="label mt-8 opacity-60" data-testid="rating-soon">You can rate {{ r.volunteerName }} once the work is finished.</p>
+      }
+      
+      @if (r.rating) {
+        <div class="mt-8">
+          <p class="label opacity-60">{{ isOwner(r) ? 'Your rating' : 'Rating from the reporter' }}</p>
+          <p class="mt-2 text-3xl tracking-widest" [attr.aria-label]="r.rating + ' out of 5 stars'">{{ stars(r.rating) }}</p>
+        </div>
+      }
+    </aside>
+  </section>
+
+  
+  
+  <section class="container-x mt-24">
+    <h2 class="text-title mb-6">Progress</h2>
+    <ol class="hairline-t">
+      @for (s of timeline(); track s.label; let i = $index) {
+        <li class="hairline-b grid-12 items-center py-5" [appFadeUp]="i">
+          <span class="col-span-1"><span class="dot" [class.dot-solid]="s.done"></span></span>
+          <span class="text-title col-span-7 md:col-span-5" [class.opacity-40]="!s.done">{{ s.label }}</span>
+          <span class="label col-span-4 text-right opacity-70 md:col-span-3 md:text-left">{{ s.date }}</span>
+          <span class="col-span-12 mt-1 opacity-80 md:col-span-3 md:mt-0 md:text-right">{{ s.note }}</span>
+        </li>
+      }
+    </ol>
+    
+    @if (r.outcomeNote) {
+      <blockquote class="text-title mt-10 max-w-[40ch] opacity-90" appFadeUp>“{{ r.outcomeNote }}”</blockquote>
+    }
+    
+    @if (r.outcomeImageUrl) {
+      <div class="duotone mt-8 aspect-[4/3] w-full max-w-xl" appImageReveal>
+        <img [src]="r.outcomeImageUrl" alt="Photo of the finished work" />
+      </div>
+    }
+  </section>
+
+  
+  
+  <section class="container-x mt-24">
+    <h2 class="text-title mb-6">Location</h2>
+    <app-map class="h-80 md:h-[26rem]" [reports]="[r]" [center]="{ lat: r.latitude, lng: r.longitude }" [zoom]="16" />
+    <p class="label mt-3 opacity-60">{{ r.barangay }} · {{ r.latitude.toFixed(4) }}, {{ r.longitude.toFixed(4) }}</p>
+  </section>
+
+  
+  
+  @if (more().length) {
+    <nav class="container-x mt-24" aria-label="More reports">
+      <h2 class="text-title mb-6">More reports</h2>
+      <div class="grid-12 gap-y-6">
+        @for (m of more(); track m.id) {
+          <a [appLink]="'/reports/' + m.id" linkLabel="Report" class="group col-span-12 hairline-t py-6 md:col-span-6">
+            <p class="label opacity-60">{{ m.barangay }}</p>
+            <p class="text-title mt-2 transition-transform duration-500 ease-expo group-hover:translate-x-2">{{ m.title }}</p>
+          </a>
+        }
+      </div>
+    </nav>
+  }
+}
