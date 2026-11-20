@@ -47,7 +47,7 @@ final class VideoStore
         $bytes = (string) file_get_contents((string) $file->getRealPath());
         $uuid = Str::uuid()->toString();
 
-        if ($disk === 'public') {
+        if ($disk === 'public' || $disk === 'cloudinary-private') {
             $folder = trim((string) config('services.cloudinary.folder', 'actify'), '/');
             $publicId = trim($folder.'/'.trim($directory, '/'), '/').'/'.$uuid;
             $storedPublicId = null;
@@ -61,7 +61,12 @@ final class VideoStore
                     throw new RuntimeException('Cloudinary returned an invalid video result.');
                 }
 
-                return new ImageStorageResult(self::CLOUDINARY_PREFIX.$storedPublicId, 'public', $storedPublicId, $secureUrl);
+                return new ImageStorageResult(
+                    self::CLOUDINARY_PREFIX.$storedPublicId,
+                    $disk === 'cloudinary-private' ? 'private' : 'public',
+                    $storedPublicId,
+                    $secureUrl,
+                );
             } catch (Throwable $e) {
                 if ($storedPublicId) {
                     try {
@@ -76,7 +81,7 @@ final class VideoStore
             }
         }
 
-        if ($disk !== 'private') {
+        if ($disk !== 'private' && $disk !== 'cloudinary-private') {
             throw new InvalidArgumentException('Videos may only be stored on the public or private disk.');
         }
 
@@ -97,6 +102,15 @@ final class VideoStore
     // Moves a pending guest video to the public disk after approval.
     public function promoteGuestVideo(string $path): ImageStorageResult
     {
+        if (str_starts_with($path, self::CLOUDINARY_PREFIX)) {
+            $publicId = substr($path, strlen(self::CLOUDINARY_PREFIX));
+            if (! str_contains($publicId, 'guest-reports/') && ! str_contains($publicId, 'pending/')) {
+                throw new InvalidArgumentException('Only guest report videos can be made public.');
+            }
+
+            return new ImageStorageResult($path, 'public', $publicId, $this->cloudinary->secureUrl($publicId, 'video'));
+        }
+
         if (! str_starts_with($path, 'guest-reports/') && ! str_starts_with($path, 'pending/')) {
             throw new InvalidArgumentException('Only guest report videos can be made public.');
         }
@@ -139,7 +153,7 @@ final class VideoStore
             return true;
         }
 
-        if ($disk === 'public' && str_starts_with($path, self::CLOUDINARY_PREFIX)) {
+        if (str_starts_with($path, self::CLOUDINARY_PREFIX)) {
             try {
                 $this->cloudinary->delete(substr($path, strlen(self::CLOUDINARY_PREFIX)), 'video');
 

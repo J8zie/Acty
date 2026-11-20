@@ -38,7 +38,7 @@ final class ImageStore
     // A guest's selfie. Always the private disk.
     public function storeSelfie(UploadedFile $file): ImageStorageResult
     {
-        return $this->storeReportPhoto($file, 'private', 'guest-selfies', 'selfie');
+        return $this->storeReportPhoto($file, 'cloudinary-private', 'guest-selfies', 'selfie');
     }
 
     // Delete either a Cloudinary public asset or a legacy/local filesystem image.
@@ -49,7 +49,7 @@ final class ImageStore
             return true;
         }
 
-        if ($disk === 'public' && $this->isCloudinaryPath($path)) {
+        if ($this->isCloudinaryPath($path)) {
             try {
                 $this->cloudinary->delete($this->cloudinaryPublicId($path));
 
@@ -76,6 +76,15 @@ final class ImageStore
     // Legacy pending/ paths remain eligible; selfie paths are never eligible for promotion.
     public function promoteGuestReportPhoto(string $path): ImageStorageResult
     {
+        if ($this->isCloudinaryPath($path)) {
+            $publicId = $this->cloudinaryPublicId($path);
+            if (! str_contains($publicId, 'guest-reports/') && ! str_contains($publicId, 'pending/')) {
+                throw new InvalidArgumentException('Only guest report photos can be made public.');
+            }
+
+            return new ImageStorageResult($path, 'public', $publicId);
+        }
+
         if (! str_starts_with($path, 'guest-reports/') && ! str_starts_with($path, 'pending/')) {
             throw new InvalidArgumentException('Only guest report photos can be made public.');
         }
@@ -102,7 +111,7 @@ final class ImageStore
             return null;
         }
 
-        if ($disk === 'public' && $this->isCloudinaryPath($path)) {
+        if ($this->isCloudinaryPath($path)) {
             return $this->cloudinary->secureUrl($this->cloudinaryPublicId($path));
         }
 
@@ -114,7 +123,7 @@ final class ImageStore
     {
         $uuid = Str::uuid()->toString();
 
-        if ($disk === 'public') {
+        if ($disk === 'public' || $disk === 'cloudinary-private') {
             $folder = trim((string) config('services.cloudinary.folder', 'actify'), '/');
             $publicId = trim($folder.'/'.trim($directory, '/'), '/').'/'.$uuid;
             $storedPublicId = null;
@@ -129,7 +138,12 @@ final class ImageStore
                     throw new RuntimeException('Cloudinary returned an invalid image result.');
                 }
 
-                return new ImageStorageResult(self::CLOUDINARY_PREFIX.$storedPublicId, 'public', $storedPublicId, $secureUrl);
+                return new ImageStorageResult(
+                    self::CLOUDINARY_PREFIX.$storedPublicId,
+                    $disk === 'cloudinary-private' ? 'private' : 'public',
+                    $storedPublicId,
+                    $secureUrl,
+                );
             } catch (Throwable $e) {
                 if ($storedPublicId) {
                     try {

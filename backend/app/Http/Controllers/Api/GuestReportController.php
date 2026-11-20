@@ -26,11 +26,11 @@ class GuestReportController extends Controller
 
         $this->enforceLimits($request->ip(), $phoneKey);
 
-        $photo = $images->storeReportPhoto($request->file('photo'), 'private', 'guest-reports', 'photo');
+        $photo = $images->storeReportPhoto($request->file('photo'), 'cloudinary-private', 'guest-reports', 'photo');
         $video = null;
         try {
             $video = $request->hasFile('video')
-                ? $videos->storeReportVideo($request->file('video'), 'private', 'guest-reports', 'video')
+                ? $videos->storeReportVideo($request->file('video'), 'cloudinary-private', 'guest-reports', 'video')
                 : null;
             $selfie = $images->storeSelfie($request->file('selfie'));
         } catch (Throwable $e) {
