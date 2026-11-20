@@ -27,7 +27,7 @@
   <section class="container-x mt-12 grid-12 gap-y-12">
     <div class="col-span-12 md:col-span-7">
       
-      <div class="duotone aspect-[4/3] w-full" [class.no-image]="imgStage() >= 2" appImageReveal>
+      <div class="duotone natural aspect-[4/3] w-full" [class.no-image]="imgStage() >= 2" appImageReveal>
         @if (imgStage() < 2) {
           <img [src]="src()" [alt]="'Photo for ' + r.title" appParallax="8" (error)="imgStage.set(imgStage() + 1)" />
         }

@@ -20,7 +20,7 @@
         <li class="hairline-t grid-12 gap-y-6 py-8" data-testid="review-item">
           <div class="col-span-12 grid grid-cols-2 gap-3 md:col-span-4">
             <a [href]="r.imageUrl" target="_blank" rel="noopener" class="grid gap-2">
-              <span class="duotone aspect-[4/3] w-full" [class.no-image]="!r.imageUrl">
+              <span class="duotone natural aspect-[4/3] w-full" [class.no-image]="!r.imageUrl">
                 @if (r.imageUrl) { <img [src]="r.imageUrl" alt="Photo of the problem" (error)="refreshPrivateImageLinks(r.id)" /> }
               </span>
               <span class="label opacity-60">Problem photo</span>
