@@ -9,13 +9,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('username');
+            $table->id();
+            $table->string('username', 30)->unique();
+            $table->string('first_name', 60);
+            $table->string('last_name', 60);
+            $table->string('email')->unique();
             $table->string('password');
-            $table->enum('role',['admin','volunteer','resident'])->default('resident');
+            $table->string('role', 20)->default('resident');
+            $table->string('photo_path')->nullable();
+            $table->rememberToken();
+            $table->timestamps();
         });
-
-      
     }
 
     public function down(): void

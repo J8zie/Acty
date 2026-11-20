@@ -6,19 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create("category",function(Blueprint $table){
-            $table->uuid("id");
-            $table->string("Category");
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 80)->unique();
+            $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('category');
+        Schema::dropIfExists('categories');
     }
 };
