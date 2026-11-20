@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Support\ImageStore;
+use App\Support\VideoStore;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,6 +26,9 @@ class TaskResource extends JsonResource
             'outcome_note' => $this->outcome_note,
             'outcome_image_url' => $this->outcome_image_path
                 ? app(ImageStore::class)->url($this->outcome_image_path, 'public')
+                : null,
+            'outcome_video_url' => $this->outcome_video_path
+                ? app(VideoStore::class)->url($this->outcome_video_path, $this->outcome_video_disk ?? 'public')
                 : null,
             'rating' => $this->rating,
         ];

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\TaskStatus;
-use Database\Factories\ReportTaskFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,12 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 // A volunteer's job on one report.
 class ReportTask extends Model
 {
-
     use HasFactory;
 
     protected $fillable = [
         'report_id', 'volunteer_id', 'status', 'accepted_at', 'started_at', 'completed_at',
-        'outcome_note', 'outcome_image_path', 'rating', 'rated_at',
+        'outcome_note', 'outcome_image_path', 'outcome_video_path', 'outcome_video_disk', 'rating', 'rated_at',
     ];
 
     // Tells Laravel which fields get special treatment.

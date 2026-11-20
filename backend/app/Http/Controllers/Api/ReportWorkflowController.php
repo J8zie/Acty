@@ -11,6 +11,7 @@ use App\Http\Resources\ReportResource;
 use App\Models\Report;
 use App\Models\ReportTask;
 use App\Support\ImageStore;
+use App\Support\VideoStore;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,6 @@ use Throwable;
 // Runs the volunteer workflow: take a report, start, finish, rate.
 class ReportWorkflowController extends Controller
 {
-
     // Lets a volunteer take an open report.
     public function accept(Request $request, Report $report): ReportResource
     {
@@ -64,7 +64,6 @@ class ReportWorkflowController extends Controller
         return $this->fresh($report);
     }
 
-
     // Marks the volunteer's task as started.
     public function start(Request $request, Report $report): ReportResource
     {
@@ -82,9 +81,8 @@ class ReportWorkflowController extends Controller
         return $this->fresh($report);
     }
 
-
     // Marks the task finished, optionally with a photo, and resolves the report.
-    public function complete(CompleteTaskRequest $request, Report $report, ImageStore $images): ReportResource
+    public function complete(CompleteTaskRequest $request, Report $report, ImageStore $images, VideoStore $videos): ReportResource
     {
         $task = $report->task;
 
@@ -98,10 +96,14 @@ class ReportWorkflowController extends Controller
         $storedImage = $request->hasFile('photo')
             ? $images->storeReportPhoto($request->file('photo'), 'public', 'volunteer-outcomes')
             : null;
+        $storedVideo = $request->hasFile('video')
+            ? $videos->storeReportVideo($request->file('video'), 'public', 'volunteer-outcomes', 'video')
+            : null;
         $oldImagePath = null;
+        $oldVideoPath = null;
 
         try {
-            DB::transaction(function () use ($task, $report, $request, $storedImage, &$oldImagePath) {
+            DB::transaction(function () use ($task, $report, $request, $storedImage, $storedVideo, &$oldImagePath, &$oldVideoPath) {
                 $lockedTask = ReportTask::query()->whereKey($task->id)->lockForUpdate()->firstOrFail();
 
                 if ($lockedTask->status === TaskStatus::Accepted) {
@@ -112,11 +114,14 @@ class ReportWorkflowController extends Controller
                 }
 
                 $oldImagePath = $lockedTask->outcome_image_path;
+                $oldVideoPath = $lockedTask->outcome_video_path;
                 if (! $lockedTask->update([
                     'status' => TaskStatus::Complete,
                     'completed_at' => now(),
                     'outcome_note' => $request->validated('note'),
                     'outcome_image_path' => $storedImage?->path,
+                    'outcome_video_path' => $storedVideo?->path,
+                    'outcome_video_disk' => $storedVideo?->disk,
                 ])) {
                     throw new RuntimeException('Unable to save task completion.');
                 }
@@ -126,16 +131,19 @@ class ReportWorkflowController extends Controller
             });
         } catch (Throwable $e) {
             $images->delete($storedImage?->path, $storedImage?->disk ?? 'public');
+            $videos->delete($storedVideo?->path, $storedVideo?->disk ?? 'public');
             throw $e;
         }
 
         if ($oldImagePath && $oldImagePath !== $storedImage?->path) {
             $images->delete($oldImagePath, 'public');
         }
+        if ($oldVideoPath && $oldVideoPath !== $storedVideo?->path) {
+            $videos->delete($oldVideoPath, 'public');
+        }
 
         return $this->fresh($report);
     }
-
 
     // Lets the resident rate the volunteer once, after the work is done.
     public function rating(RateReportRequest $request, Report $report): ReportResource
@@ -145,7 +153,6 @@ class ReportWorkflowController extends Controller
         if (! $task || $task->status !== TaskStatus::Complete) {
             throw ValidationException::withMessages(['rating' => ['You can rate the volunteer once the work is finished.']]);
         }
-
 
         $changed = ReportTask::query()
             ->whereKey($task->id)

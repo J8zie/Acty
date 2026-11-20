@@ -24,6 +24,7 @@ class CompleteTaskRequest extends FormRequest
         return [
             'note' => ['required', 'string', 'min:3', 'max:1000'],
             'photo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:'.config('actify.images.max_kb')],
+            'video' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime', 'max:'.((int) config('actify.videos.max_mb') * 1024)],
             ...$this->confirmationRules(),
         ];
     }
@@ -35,6 +36,8 @@ class CompleteTaskRequest extends FormRequest
             'note.required' => 'Write a short note about what you did.',
             'note.min' => 'Write a short note about what you did.',
             'photo.mimes' => 'The photo must be a JPG, PNG or WebP file.',
+            'video.mimetypes' => 'The video must be an MP4, WebM or MOV file.',
+            'video.max' => 'The video is too big (the limit is '.(int) config('actify.videos.max_mb').' MB).',
             ...$this->confirmationMessages(),
         ];
     }

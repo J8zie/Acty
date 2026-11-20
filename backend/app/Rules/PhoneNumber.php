@@ -5,19 +5,16 @@ namespace App\Rules;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 
-// Checks that a phone number looks real.
+// Checks that a phone number is digits only.
 class PhoneNumber implements ValidationRule
 {
-    // Fails when the text is not a plausible phone number.
+    // Fails when the text is not 7 to 15 digits.
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         $text = is_string($value) ? trim($value) : '';
-        $digits = preg_replace('/\D+/', '', $text) ?? '';
 
-        $shapeOk = (bool) preg_match('/^\+?\(?[0-9][0-9 ()\-.]*$/', $text);
-
-        if (! $shapeOk || strlen($digits) < 7 || strlen($digits) > 15) {
-            $fail('The :attribute must be a phone number such as 0912 345 6789 or +63 912 345 6789.');
+        if (! preg_match('/^\d{7,15}$/', $text)) {
+            $fail('The :attribute must be a phone number with digits only, such as 09123456789.');
         }
     }
 }

@@ -142,6 +142,7 @@ class ReportController extends Controller
             $images->delete($path, $disk);
         }
         $videos->delete($report->video_path, $report->video_disk ?? 'public');
+        $videos->delete($report->task?->outcome_video_path, $report->task?->outcome_video_disk ?? 'public');
 
         return response()->noContent();
     }
