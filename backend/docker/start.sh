@@ -11,4 +11,7 @@ php artisan package:discover --ansi
 php artisan migrate --force              # creates / updates the tables
 php artisan db:seed --class=AdminSeeder --force   # first admin from ADMIN_* (does nothing when they are not set)
 
+php artisan config:cache
+php artisan route:cache
+
 exec apache2-foreground

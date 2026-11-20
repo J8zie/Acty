@@ -5,11 +5,7 @@ use Pdo\Mysql;
 
 return [
 
-
-
     'default' => env('DB_CONNECTION', 'sqlite'),
-
-
 
     'connections' => [
 
@@ -79,10 +75,12 @@ return [
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
 
-
-            'options' => extension_loaded('pdo_pgsql') && env('DB_EMULATE_PREPARES', false)
-                ? [PDO::ATTR_EMULATE_PREPARES => true]
-                : [],
+            'options' => [
+                PDO::ATTR_PERSISTENT => (bool) env('DB_PERSISTENT', true),
+                ...(extension_loaded('pdo_pgsql') && env('DB_EMULATE_PREPARES', false)
+                    ? [PDO::ATTR_EMULATE_PREPARES => true]
+                    : []),
+            ],
         ],
 
         'sqlsrv' => [
@@ -97,19 +95,14 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
 
-
         ],
 
     ],
-
-
 
     'migrations' => [
         'table' => 'migrations',
         'update_date_on_publish' => true,
     ],
-
-
 
     'redis' => [
 
