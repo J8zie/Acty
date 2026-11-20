@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "dist/frontend",
+  "outputDirectory": "dist/frontend/browser",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "https://acty.onrender.com/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
