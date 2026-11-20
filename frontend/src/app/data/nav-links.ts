@@ -34,6 +34,7 @@ export const NAV_LINKS: Record<Role | 'visitor', NavLink[]> = {
   ],
   admin: [
     { to: '/admin', label: 'Dashboard', exact: true },
+    { to: '/admin/review', label: 'Review' },
     { to: '/admin/users', label: 'Users' },
     { to: '/reports', label: 'Reports', exact: true },
     { to: '/rankings', label: 'Rankings' },

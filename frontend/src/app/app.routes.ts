@@ -79,6 +79,13 @@ export const routes: Routes = [
   },
 
   {
+    path: 'admin/review',
+    title: 'Review' + SUFFIX,
+    canActivate: [roleGuard('admin')],
+    loadComponent: () => import('./pages/admin/review').then((m) => m.Review),
+  },
+
+  {
     path: 'admin/users',
     title: 'Users' + SUFFIX,
     canActivate: [roleGuard('admin')],

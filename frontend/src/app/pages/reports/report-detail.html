@@ -32,6 +32,9 @@
           <img [src]="src()" [alt]="'Photo for ' + r.title" appParallax="8" (error)="imgStage.set(imgStage() + 1)" />
         }
       </div>
+      @if (r.videoUrl; as video) {
+        <video [src]="video" controls playsinline class="mt-6 aspect-video w-full bg-black"></video>
+      }
       
       <p class="text-title mt-10 max-w-[36ch]" appFadeUp>{{ r.description }}</p>
     </div>

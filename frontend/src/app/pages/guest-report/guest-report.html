@@ -175,6 +175,10 @@
               [value]="problemShot()"
               (shot)="problemShot.set($event)"
             />
+            <div class="mt-8">
+              <p class="label mb-3 opacity-60">Video of the problem (optional)</p>
+              <app-file-drop kind="video" title="Add a video" (chosen)="videoFile.set($event)" />
+            </div>
           </div>
           
           <aside class="col-span-12 grid content-start gap-4 md:col-span-4 md:col-start-9">

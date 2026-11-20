@@ -70,6 +70,8 @@ export interface Report {
 
   imageUrl: string | null;
 
+  videoUrl: string | null;
+
   createdAt: string;
 
   source: 'guest' | 'account';

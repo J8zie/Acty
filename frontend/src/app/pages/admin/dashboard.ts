@@ -46,8 +46,6 @@ export class Dashboard {
 
 
 
-  protected readonly queue = loader(() => this.api.list({ review: 'pending' }), [] as Report[]);
-
   private readonly categories = loader(() => this.api.categories(), []);
   protected readonly categoryOptions = computed<FilterOption[]>(() => this.categories.data().map((c) => ({ value: c.id, label: c.name })));
 
@@ -55,14 +53,6 @@ export class Dashboard {
 
   protected readonly counts = signal<Stats | null>(null);
 
-
-  protected readonly reviewing = signal<string | null>(null);
-
-  protected readonly reviewProblem = signal('');
-  private readonly refreshedPrivateImageReports = new Set<string>();
-
-
-  protected readonly toReview = computed(() => this.queue.data().filter((r) => r.source === 'guest' && r.reporter));
 
   protected readonly pending = signal<string | null>(null);
 
@@ -107,51 +97,6 @@ export class Dashboard {
 
     }
   }
-
-  protected async refreshPrivateImageLinks(id: string): Promise<void> {
-    if (this.refreshedPrivateImageReports.has(id)) return;
-    this.refreshedPrivateImageReports.add(id);
-
-    try {
-      const fresh = await this.api.get(id);
-      this.queue.data.update((all) => all.map((report) => (report.id === id ? fresh : report)));
-    } catch {
-      this.reviewProblem.set('The private photos could not be refreshed. Reload the review queue and try again.');
-    }
-  }
-
-
-
-  protected async decide(r: Report, decision: 'approve' | 'reject'): Promise<void> {
-    const approve = decision === 'approve';
-    const sure = await this.confirmer.confirm({
-      title: approve ? 'Approve this report?' : 'Reject this report?',
-      message: approve
-        ? 'It becomes public as an open request and volunteers can accept it. Its problem photo becomes public too; the selfie stays private.'
-        : 'It stays hidden from everyone. The reporter’s details and pictures are deleted after 30 days.',
-      details: [`#${r.number} · ${r.title}`, r.reporter ? `${r.reporter.firstName} ${r.reporter.lastName} · ${r.reporter.phone}` : ''].filter(Boolean),
-      confirmLabel: approve ? 'Approve' : 'Reject',
-      tone: approve ? 'normal' : 'danger',
-    });
-    if (!sure) return;
-    this.reviewing.set(r.id);
-    this.reviewProblem.set('');
-    try {
-
-
-
-      await this.api.review(r.id, decision);
-      this.queue.data.update((all) => all.filter((x) => x.id !== r.id));
-      if (approve) void this.list.reload();
-      void this.refreshStats();
-    } catch (e) {
-      this.reviewProblem.set(errorMessage(e));
-    } finally {
-      this.reviewing.set(null);
-    }
-  }
-
-
 
   protected async setStatus(r: Report, event: Event): Promise<void> {
     const select = event.target as HTMLSelectElement;

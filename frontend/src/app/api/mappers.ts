@@ -83,6 +83,7 @@ export function toReport(d: ReportDto): Report {
     longitude: Number(d.longitude),
 
     imageUrl: d.image_url ?? null,
+    videoUrl: d.video_url ?? null,
     createdAt: d.created_at?.slice(0, 10) ?? '',
 
     volunteerId: volunteer ? String(volunteer.id) : undefined,

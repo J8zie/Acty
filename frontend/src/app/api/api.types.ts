@@ -59,6 +59,7 @@ export interface ReportDto {
   latitude: number | string;
   longitude: number | string;
   image_url?: string | null;
+  video_url?: string | null;
   created_at: string;
   user_id?: Id;
 

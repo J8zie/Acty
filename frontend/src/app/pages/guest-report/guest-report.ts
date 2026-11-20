@@ -2,6 +2,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CameraCapture } from '../../components/media/camera-capture/camera-capture';
+import { FileDrop } from '../../components/media/file-drop/file-drop';
 import { LatLng, MapView } from '../../components/map/map-view';
 import { PageHead } from '../../components/layout/page-head/page-head';
 import { FieldError } from '../../components/ui/field-error/field-error';
@@ -30,7 +31,7 @@ const SERVER_STEP: Record<string, number> = {
   first_name: 0, last_name: 0, phone: 0, email: 0, reporter_barangay: 0,
   title: 1, description: 1, category_id: 1, barangay: 1, latitude: 1, longitude: 1,
   selfie: 0, liveness_prompt: 0,
-  photo: 2, consent: 2,
+  photo: 2, video: 2, consent: 2,
 };
 
 const API_CONTROL: Record<string, Control> = {
@@ -40,7 +41,7 @@ const API_CONTROL: Record<string, Control> = {
 
 @Component({
   selector: 'app-guest-report',
-  imports: [ReactiveFormsModule, PageHead, MapView, CameraCapture, MagneticDirective, LinkDirective, FieldError],
+  imports: [ReactiveFormsModule, PageHead, MapView, CameraCapture, FileDrop, MagneticDirective, LinkDirective, FieldError],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './guest-report.html',
   styleUrl: './guest-report.css',
@@ -82,6 +83,8 @@ export class GuestReport {
   protected readonly problemShot = signal<LivePhoto | null>(null);
 
   protected readonly selfieShot = signal<LivePhoto | null>(null);
+
+  protected readonly videoFile = signal<File | null>(null);
 
 
 
@@ -300,6 +303,7 @@ export class GuestReport {
         longitude: pos.lng,
         problemPhoto: photo,
         selfie,
+        video: this.videoFile(),
         livenessPrompt: this.prompt,
       });
       this.receipt.set(receipt);

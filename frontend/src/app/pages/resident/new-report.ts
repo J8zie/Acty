@@ -47,6 +47,8 @@ export class NewReport {
 
   protected readonly photo = signal<File | null>(null);
 
+  protected readonly video = signal<File | null>(null);
+
 
   protected readonly submitted = signal(false);
 
@@ -136,6 +138,7 @@ export class NewReport {
         latitude: pos.lat,
         longitude: pos.lng,
         photo: this.photo(),
+        video: this.video(),
       });
       void this.transition.go('/reports/' + report.id, 'Report');
     } catch (e) {

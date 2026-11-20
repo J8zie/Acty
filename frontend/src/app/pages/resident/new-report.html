@@ -82,6 +82,10 @@
       <p class="label mb-3 opacity-60">Photo (optional)</p>
       <app-file-drop title="Add a photo of the problem" (chosen)="photo.set($event)" />
     </div>
+    <div>
+      <p class="label mb-3 opacity-60">Video (optional)</p>
+      <app-file-drop kind="video" title="Add a video of the problem" (chosen)="video.set($event)" />
+    </div>
   </div>
 
   

@@ -19,6 +19,7 @@ export interface NewReportInput {
   longitude: number;
 
   photo?: File | null;
+  video?: File | null;
 }
 
 export interface LivePhoto {
@@ -48,6 +49,8 @@ export interface GuestReportInput {
 
   problemPhoto: LivePhoto;
   selfie: LivePhoto;
+
+  video?: File | null;
 
   livenessPrompt: string;
 }
@@ -167,6 +170,7 @@ export class ReportsService {
     form.set('latitude', String(input.latitude));
     form.set('longitude', String(input.longitude));
     if (input.photo) form.set('photo', input.photo);
+    if (input.video) form.set('video', input.video);
     return one(await firstValueFrom(this.http.post<ReportDto | { data: ReportDto }>(url('/reports'), form)));
   }
 
@@ -200,6 +204,7 @@ export class ReportsService {
     form.set('selfie', input.selfie.file);
     form.set('selfie_captured_at', input.selfie.capturedAt);
     form.set('selfie_capture_method', input.selfie.method);
+    if (input.video) form.set('video', input.video);
     form.set('liveness_prompt', input.livenessPrompt);
     form.set('consent', '1');
     const body = await firstValueFrom(this.http.post<GuestReceiptDto | { data: GuestReceiptDto }>(url('/reports/guest'), form));
