@@ -1,0 +1,83 @@
+
+
+<div class="pointer-events-none fixed inset-x-0 top-0 z-[55] h-[3px]" aria-hidden="true">
+  <div #progress class="h-full origin-left scale-x-0 bg-brand-accent"></div>
+</div>
+
+<header
+  class="fixed inset-x-0 top-0 z-50 bg-brand-background/95 pt-[env(safe-area-inset-top)] transition-transform duration-700 ease-expo"
+  [class.-translate-y-full]="hidden() && !open()"
+>
+  <div class="container-x hairline-b flex h-16 items-center justify-between gap-4 sm:gap-6">
+    
+    <a appLink="/" linkLabel="Home" class="font-display flex items-center gap-2.5 text-lg tracking-[0.02em]" (click)="close()">
+      <span class="dot dot-open"></span>Actify
+    </a>
+
+    
+    <nav class="hidden items-center gap-6 lg:flex xl:gap-8" aria-label="Main">
+      @for (item of links(); track item.to) {
+        <a [appLink]="item.to" [exact]="!!item.exact" class="label u-link">{{ item.label }}</a>
+      }
+    </nav>
+
+    
+    <div class="flex items-center gap-5">
+      
+      <span class="label hidden opacity-60 xl:block" title="Local time in Tagum City">Tagum · {{ clock() }}</span>
+      <app-theme-toggle />
+      
+      @if (auth.user(); as user) {
+        
+        <a appLink="/account" linkLabel="Account" class="hidden items-center gap-2.5 lg:flex" title="Your account" data-testid="header-account">
+          <app-avatar [user]="user" [size]="30" />
+          <span class="label opacity-60">{{ user.firstName }}</span>
+        </a>
+        
+        <button type="button" class="label u-link hidden lg:block" (click)="logout()">Log out</button>
+      } @else {
+        
+        <a appLink="/login" class="label u-link hidden lg:block">Log in</a>
+        <a appLink="/register" appMagnetic class="btn btn-solid btn-sm hidden !px-4 lg:inline-flex">Join</a>
+      }
+      
+      <button
+        type="button"
+        class="label -m-3 p-3 lg:hidden"
+        [attr.aria-expanded]="open()"
+        aria-controls="mobile-menu"
+        (click)="toggleMenu()"
+      >
+        {{ open() ? 'Close' : 'Menu' }}
+      </button>
+    </div>
+  </div>
+</header>
+
+<div
+  id="mobile-menu"
+  class="fixed inset-0 z-40 flex flex-col justify-between gap-10 overflow-y-auto overscroll-contain bg-brand-background px-[max(clamp(1rem,3vw,3rem),env(safe-area-inset-left))] pt-[calc(6rem+env(safe-area-inset-top))] pb-[max(2rem,env(safe-area-inset-bottom))] transition-[clip-path] duration-[800ms] ease-inout-expo lg:hidden"
+  [style.clip-path]="open() ? 'inset(0 0 0 0)' : 'inset(0 0 100% 0)'"
+  [attr.aria-hidden]="!open()"
+  [attr.inert]="open() ? null : ''"
+>
+  
+  <nav class="grid gap-2" aria-label="Mobile">
+    @for (item of links(); track item.to) {
+      <a [appLink]="item.to" [exact]="!!item.exact" class="text-headline" (click)="close()">{{ item.label }}</a>
+    }
+  </nav>
+  
+  <div class="flex items-center justify-between">
+    @if (auth.user(); as user) {
+      <a appLink="/account" linkLabel="Account" class="flex items-center gap-3" (click)="close()">
+        <app-avatar [user]="user" [size]="44" />
+        <span class="label">Account</span>
+      </a>
+      <button type="button" class="btn" (click)="logout()">Log out</button>
+    } @else {
+      <a appLink="/login" class="btn" (click)="close()">Log in</a>
+      <a appLink="/register" class="btn btn-solid" (click)="close()">Join</a>
+    }
+  </div>
+</div>

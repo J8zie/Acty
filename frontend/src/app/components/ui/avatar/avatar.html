@@ -1,0 +1,7 @@
+
+
+@if (src(); as s) {
+  <img [src]="s" alt="" (error)="broken()" />
+} @else {
+  <span aria-hidden="true">{{ initials() }}</span>
+}

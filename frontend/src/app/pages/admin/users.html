@@ -1,0 +1,63 @@
+
+
+<app-page-head eyebrow="Admin" [meta]="list.state() === 'ready' ? list.total() + (list.active() ? ' found' : ' accounts') : ''" title="People on Actify." lead="Search by name, username or email. Change a role or remove an account.">
+  <a appLink="/admin" appMagnetic class="btn">Back to dashboard</a>
+</app-page-head>
+
+<app-load-state [state]="list.state()" [error]="list.error()" (retry)="list.reload()" />
+
+@if (list.state() === 'ready') {
+  <section class="container-x">
+    
+    <div class="mb-6 grid gap-5" aria-label="Search and filters" data-testid="filters">
+      <div class="flex flex-wrap items-end gap-x-6 gap-y-5">
+        <app-search-box class="grow md:max-w-md" label="Search people" placeholder="Name, username or email" testId="people-search" [value]="list.filters().q" (valueChange)="list.setFilter('q', $event)" />
+        <app-filter-select label="Role" allLabel="Every role" testId="filter-role" [options]="roleOptions" [value]="list.filters().role" (valueChange)="list.setFilter('role', $event)" />
+        <app-filter-select label="Sort" testId="filter-sort" [withAll]="false" [options]="sortOptions" [value]="list.filters().sort || 'newest'" (valueChange)="list.setFilter('sort', $event === 'newest' ? '' : $event)" />
+      </div>
+      <app-result-bar [shown]="list.items().length" [total]="list.total()" noun="people" [filtered]="list.active()" [busy]="list.busy()" (clear)="list.reset()" />
+    </div>
+    @if (problem()) {
+      <p class="error-text mb-4" role="alert">{{ problem() }}</p>
+    }
+    <div class="label grid-12 hairline-t py-3 opacity-60">
+      <span class="col-span-6 md:col-span-3">Name</span>
+      <span class="hidden md:col-span-2 md:block">Username</span>
+      <span class="hidden md:col-span-3 md:block">Email</span>
+      <span class="col-span-3 md:col-span-2">Role</span>
+      <span class="col-span-3 text-right md:col-span-2">Action</span>
+    </div>
+    
+    <ul>
+      @for (u of list.items(); track u.id) {
+        <li class="hairline-t grid-12 items-center py-4">
+          <span class="col-span-6 text-base tracking-tight md:col-span-3 md:text-lg">{{ u.firstName }} {{ u.lastName }}</span>
+          <span class="label hidden opacity-60 md:col-span-2 md:block">{{ u.username }}</span>
+          <span class="label hidden opacity-60 md:col-span-3 md:block">{{ u.email }}</span>
+          <span class="col-span-3 md:col-span-2">
+            <select class="input !py-1 !pr-2" [disabled]="u.id === me() || pending() === u.id" (change)="setRole(u, $event)" [attr.aria-label]="'Role of ' + u.username">
+              @for (r of roles; track r) {
+                <option [value]="r" [selected]="r === u.role">{{ r }}</option>
+              }
+            </select>
+          </span>
+          <span class="col-span-3 flex justify-end gap-3 md:col-span-2">
+            @if (u.id === me()) {
+              <span class="label opacity-50">You</span>
+            } @else {
+              <button type="button" class="label u-link" data-testid="remove-user" [disabled]="pending() === u.id" (click)="remove(u)" [attr.aria-label]="'Remove ' + u.username">Remove</button>
+            }
+          </span>
+        </li>
+      } @empty {
+        <li class="hairline-t py-10 opacity-70">{{ list.active() ? 'Nobody matches that search.' : 'No accounts yet.' }}</li>
+      }
+    </ul>
+    <div class="hairline-t"></div>
+    @if (list.hasMore()) {
+      <div class="mt-8 flex justify-center">
+        <button type="button" class="btn" data-testid="load-more" [disabled]="list.busy()" (click)="list.loadMore()">{{ list.busy() ? 'Loading…' : 'Load more (' + remaining() + ' left)' }}</button>
+      </div>
+    }
+  </section>
+}

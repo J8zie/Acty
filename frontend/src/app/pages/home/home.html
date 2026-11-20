@@ -1,0 +1,119 @@
+
+
+<div class="relative isolate overflow-hidden">
+  <section class="container-x flex min-h-svh flex-col justify-between pt-28 pb-8">
+    <p class="label flex justify-between gap-4 opacity-70">
+      <span>Community reporting platform</span>
+      <span class="text-right">Tagum City, Davao del Norte</span>
+    </p>
+
+    
+    <h1 class="text-display my-10 max-w-[18ch] md:max-w-[16ch]" appReveal="load">
+      See a problem? Say it. <span class="mark">Neighbours</span> fix it.
+    </h1>
+
+    <div class="grid-12 items-end gap-y-8">
+      <div class="col-span-12 md:col-span-6 lg:col-span-5" appCursorParallax="14">
+        <p class="text-title opacity-90">
+          Actify lets residents report what is broken in their barangay and lets volunteers step in to solve it.
+        </p>
+        
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a [appLink]="primary().to" appMagnetic class="btn btn-solid">{{ primary().label }}</a>
+          <a [appLink]="secondary().to" appMagnetic class="btn">{{ secondary().label }}</a>
+        </div>
+      </div>
+
+      
+      <div class="col-span-12 md:col-span-5 md:col-start-8 lg:col-span-4 lg:col-start-9">
+        <div class="duotone natural aspect-[4/3] w-full" [class.no-image]="heroFailed()" appImageReveal>
+          <img src="images/hero-community.jpg" alt="Neighbours working together on a street clean-up" appParallax="9" (error)="heroFailed.set(true)" />
+        </div>
+        <p class="label mt-3 flex justify-between opacity-70"><span>Fig. 01</span><span>Neighbours at work</span></p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<section id="about" class="container-x pt-24 md:pt-40">
+  <div class="grid-12 items-start gap-y-12">
+    <div class="col-span-12 md:col-span-7">
+      <p class="label mb-8 opacity-70">About Actify</p>
+      <h2 class="text-headline max-w-[26ch]" appReveal>
+        From clogged drains to dark streets, every small problem has someone nearby willing to help.
+      </h2>
+      <p class="text-title mt-8 max-w-[40ch] opacity-85">
+        Actify is a community reporting platform for Tagum City. Residents pin what is broken in their barangay, volunteers
+        nearby pick it up, and anyone can follow a report from open to resolved.
+      </p>
+      <p class="label mt-6 opacity-60">Non-emergency reports only. In an emergency, call 911.</p>
+    </div>
+    
+    <div class="col-span-12 md:col-span-4 md:col-start-9">
+      <div class="duotone natural aspect-[4/3] w-full md:aspect-[4/5]" [class.no-image]="volFailed()" appImageReveal>
+        <img src="images/volunteers-action.jpg" alt="Volunteers cleaning a community space" appParallax="8" (error)="volFailed.set(true)" />
+      </div>
+      <p class="label mt-3 flex justify-between opacity-70"><span>Fig. 02</span><span>Volunteers in action</span></p>
+    </div>
+  </div>
+
+  
+  <div class="hairline-t mt-16 grid md:mt-24 md:grid-cols-3">
+    @for (r of roles; track r.who; let i = $index) {
+      <div class="hairline-b py-8 md:border-b-0 md:py-10 md:pr-10" [appFadeUp]="i">
+        <p class="label opacity-60">{{ r.who }}</p>
+        <p class="text-title mt-4 max-w-[28ch] opacity-90">{{ r.text }}</p>
+      </div>
+    }
+  </div>
+
+  
+  <div class="hairline-t grid grid-cols-2 md:grid-cols-4" role="group" aria-label="Reports so far">
+    @for (s of stats(); track s.label; let i = $index) {
+      <div class="hairline-b py-8 pr-4 md:border-r md:border-brand-text/30 md:px-6 md:first:pl-0 md:last:border-r-0" [appFadeUp]="i">
+        
+        @if (s.value === null) {
+          <div class="skeleton h-[clamp(2rem,5vw,4.5rem)] w-24 max-w-full" aria-hidden="true"></div>
+          <p class="label mt-4 opacity-70">{{ s.label }}</p>
+        } @else {
+          
+          <p class="text-display leading-none [font-variant-numeric:tabular-nums]" [appCountUp]="s.value">{{ s.value }}</p>
+          <p class="label mt-4 opacity-70">{{ s.label }}</p>
+        }
+      </div>
+    }
+  </div>
+</section>
+
+<section id="how" class="mt-24 md:mt-40" data-anchor-offset="-112">
+  <div class="container-x mb-10 flex items-end justify-between">
+    <h2 class="text-headline" appReveal>How it works</h2>
+    <p class="label hidden opacity-70 md:block">Three steps</p>
+  </div>
+  
+  <ol class="works hairline-t">
+    @for (s of steps; track s.n; let i = $index) {
+      <li class="hairline-b" [appFadeUp]="i">
+        <div class="row container-x grid-12 items-baseline gap-y-3 py-8 md:py-12">
+          <span class="label col-span-2 opacity-60 md:col-span-1">{{ s.n }}</span>
+          <div class="col-span-10 md:col-span-5">
+            <h3 class="text-headline">{{ s.title }}</h3>
+            <p class="mt-3 opacity-80"><app-status [status]="s.status" /></p>
+          </div>
+          <p class="text-title col-span-12 max-w-[32ch] opacity-80 md:col-span-5 md:col-start-8">{{ s.text }}</p>
+        </div>
+      </li>
+    }
+  </ol>
+</section>
+
+<section class="inverted mt-24 md:mt-40">
+  <div class="container-x py-24 md:py-36">
+    <p class="label opacity-70">Ready when you are</p>
+    <h2 class="text-display mt-6 max-w-[14ch]" appReveal>Join your neighbours.</h2>
+    <div class="mt-10 flex flex-wrap gap-3">
+      <a [appLink]="primary().to" appMagnetic class="btn btn-solid">{{ primary().label }}</a>
+      <a [appLink]="secondary().to" appMagnetic class="btn">{{ secondary().label }}</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,8 @@
+
+
+export const BARANGAYS: readonly string[] = [
+  'Apokon', 'Bincungan', 'Busaon', 'Canocotan', 'Cuambogan', 'La Filipina', 'Liboganon', 'Madaum',
+  'Magdum', 'Magugpo East', 'Magugpo North', 'Magugpo Poblacion', 'Magugpo South', 'Magugpo West',
+  'Mankilam', 'New Balamban', 'Nueva Fuerza', 'Pagsabangan', 'Pandapan', 'San Agustin', 'San Isidro',
+  'San Miguel', 'Visayan Village',
+];

@@ -1,0 +1,32 @@
+
+<ul class="works hairline-t">
+  
+  @for (r of reports(); track r.id; let i = $index) {
+    <li class="hairline-b" [appFadeUp]="i">
+      
+      <a
+        class="row container-x grid-12 items-baseline gap-y-2 py-5 hover:text-brand-background md:py-7"
+        [appLink]="'/reports/' + r.id"
+        linkLabel="Report"
+        appInk
+        [appPreview]="image(r)"
+        [previewLabel]="r.category"
+        [previewNumber]="pad(r.number)"
+      >
+        <span class="label col-span-2 opacity-60 md:col-span-1">{{ pad(r.number) }}</span>
+        <span class="text-title col-span-10 md:col-span-5">{{ r.title }}</span>
+        <span class="label col-span-7 opacity-60 md:col-span-3 md:col-start-auto">{{ r.barangay }}</span>
+        <span class="col-span-5 md:col-span-2 md:text-left"><app-status [status]="r.status" /></span>
+        <span class="row-arrow hidden text-right text-2xl md:col-span-1 md:block" aria-hidden="true">→</span>
+      </a>
+    </li>
+  } @empty {
+    
+    <li class="container-x py-16">
+      <p class="text-title">{{ emptyTitle() }}</p>
+      @if (emptyText()) {
+        <p class="label mt-3 opacity-60">{{ emptyText() }}</p>
+      }
+    </li>
+  }
+</ul>

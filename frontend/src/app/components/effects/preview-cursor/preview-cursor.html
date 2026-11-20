@@ -1,0 +1,21 @@
+
+
+@if (enabled) {
+  
+  <div
+    #box
+    class="pointer-events-none fixed top-0 left-0 z-[60] w-[min(24vw,340px)] min-w-[220px] opacity-0"
+    style="visibility: hidden"
+    aria-hidden="true"
+  >
+    
+    <div class="duotone aspect-[4/5] w-full" [class.no-image]="failed() === preview.state().src">
+      <img [src]="preview.state().src" alt="" (error)="failed.set(preview.state().src)" />
+    </div>
+    
+    <p class="label mt-3 flex justify-between">
+      <span>{{ preview.state().number }}</span>
+      <span>{{ preview.state().label }}</span>
+    </p>
+  </div>
+}
